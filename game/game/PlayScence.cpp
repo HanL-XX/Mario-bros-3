@@ -7,6 +7,8 @@
 #include "Sprites.h"
 #include "Portal.h"
 #include "Street.h"
+#include "Pipe.h"
+
 
 using namespace std;
 
@@ -33,6 +35,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
 #define OBJECT_TYPE_STREET	4
+#define OBJECT_TYPE_PIPE	5
+
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -83,7 +87,7 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 
 	if (tokens.size() < 3) return; // skip invalid lines - an animation must at least has 1 frame and 1 frame time
 
-	//DebugOut(L"--> %s\n",ToWSTR(line).c_str());
+	DebugOut(L"--> %s\n",ToWSTR(line).c_str());
 
 	LPANIMATION ani = new CAnimation();
 
@@ -94,7 +98,6 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 		int frame_time = atoi(tokens[i + 1].c_str());
 		ani->Add(sprite_id, frame_time);
 	}
-
 	CAnimations::GetInstance()->Add(ani_id, ani);
 }
 
@@ -159,6 +162,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_STREET: obj = new CStreet(); break;
+	case OBJECT_TYPE_PIPE: obj = new CPIPE(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
