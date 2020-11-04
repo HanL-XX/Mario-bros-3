@@ -2,7 +2,7 @@
 void CPIPE::Render()
 {
 	animation_set->at(0)->Render(x, y);
-	//RenderBoundingBox();
+	RenderBoundingBox();
 }
 
 void CPIPE::GetBoundingBox(float& l, float& t, float& r, float& b)
