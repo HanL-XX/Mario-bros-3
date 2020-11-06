@@ -85,6 +85,15 @@ public:
 		float& ny,
 		float& rdx,
 		float& rdy);
+	void FilterCollisionbox(
+		vector<LPCOLLISIONEVENT>& coEvents,
+		vector<LPCOLLISIONEVENT>& coEventsResult,
+		float& min_tx,
+		float& min_ty,
+		float& nx,
+		float& ny,
+		float& rdx,
+		float& rdy);
 
 	CGameObject();
 
