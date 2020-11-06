@@ -1,4 +1,6 @@
 #include "Goomba.h"
+#include <ctime>
+
 CGoomba::CGoomba()
 {
 	SetState(GOOMBA_STATE_WALKING);
@@ -23,19 +25,56 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
 
-	x += dx;
-	y += dy;
-
-	if (vx < 0 && x < 0) {
-		x = 0; vx = -vx;
+	coEvents.clear();
+	if(state!=GOOMBA_ANI_DIE)
+		CalcPotentialCollisions(coObjects, coEvents);
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
 	}
-
-	if (vx > 0 && x > 290) {
-		x = 290; vx = -vx;
+	else
+	{
+		float min_tx, min_ty, nx = 0, ny;
+		float rdx = 0;
+		float rdy = 0;
+		CGoomba::FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 	}
+	
 }
+void CGoomba::FilterCollision(
+	vector<LPCOLLISIONEVENT>& coEvents,
+	vector<LPCOLLISIONEVENT>& coEventsResult,
+	float& min_tx, float& min_ty,
+	float& nx, float& ny, float& rdx, float& rdy)
+{
+	min_tx = 1.0f;
+	min_ty = 1.0f;
+	int min_ix = -1;
+	int min_iy = -1;
 
+	nx = 0.0f;
+	ny = 0.0f;
+
+	coEventsResult.clear();
+
+	for (UINT i = 0; i < coEvents.size(); i++)
+	{
+		LPCOLLISIONEVENT c = coEvents[i];
+		if (c->t < min_tx && c->nx != 0) {
+			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx; vx = -vx;
+		}
+		if (c->t < min_ty && c->ny != 0) {
+			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy; vx = -vx;
+		}
+	}
+
+	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+}
 void CGoomba::Render()
 {
 	int ani = GOOMBA_ANI_WALKING;
@@ -61,4 +100,10 @@ void CGoomba::SetState(int state)
 	case GOOMBA_STATE_WALKING:
 		vx = -GOOMBA_WALKING_SPEED;
 	}
+}
+void CGoomba::Clear()
+{
+	
+	this->x = NULL;
+	this->y = NULL;
 }

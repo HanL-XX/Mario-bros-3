@@ -26,6 +26,9 @@
 
 #define MARIO_ANI_DIE				8
 
+#define	MARIO_ANI_JUMP_RIGHT	9
+#define	MARIO_ANI_JUMP_LEFT	10
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 

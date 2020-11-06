@@ -4,7 +4,7 @@
 #define GOOMBA_WALKING_SPEED 0.05f;
 
 #define GOOMBA_BBOX_WIDTH 16
-#define GOOMBA_BBOX_HEIGHT 15
+#define GOOMBA_BBOX_HEIGHT 16
 #define GOOMBA_BBOX_HEIGHT_DIE 9
 
 #define GOOMBA_STATE_WALKING 100
@@ -22,4 +22,10 @@ class CGoomba : public CGameObject
 public:
 	CGoomba();
 	virtual void SetState(int state);
+	virtual void CGoomba::FilterCollision(
+		vector<LPCOLLISIONEVENT>& coEvents,
+		vector<LPCOLLISIONEVENT>& coEventsResult,
+		float& min_tx, float& min_ty,
+		float& nx, float& ny, float& rdx, float& rdy);
+	void Clear();
 };

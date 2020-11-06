@@ -9,6 +9,7 @@
 60	textures\1-1.png	156	252	240
 70	textures\Stage.png	224	163	216
 80	textures\Goal Roulette.png	0	183	239
+90	textures\enemies-2.png	0	128	128
 
 # id	left	top	right	bottom	texture_id
 [SPRITES]
@@ -36,6 +37,9 @@
 # walk
 10032	155	0	170	15	0
 10033	125	0	139	15	0
+#jump
+10034	395	80	411	96	0
+10035	35	80	51	96	0
 #BRICK
 20001	171	392	188	408	50
 #GOOMBA
@@ -158,6 +162,15 @@
 94	494	222	510	238	50
 #blackback
 95	2525	25	2800	170	60
+#Koopas
+#walk left
+50001	205	191	221	217	90
+50002	222	191	238	217	90
+#walk right
+50011	187	191	202	217	90
+50012	170	191	185	217	90
+#die
+50031	152	202	168	217	20
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 # ==== MARIO =========
@@ -179,6 +192,10 @@
 503	10031	100	10032	100	10033	100
 #die
 599	10099	100
+#jump small right
+800	10034	100
+#jum small left
+801	10035	100
 # ==== BRICK =========
 601	20001	100
 # ==== QUESTION MARK BRICK =========
@@ -297,12 +314,19 @@
 94	94	100
 #=======blackback=====
 95	95	100
+# ==== KOOPAS  =========
+#walk left
+901	50001	100	50002	100
+#walk right
+902	50011	100	50012	100
+#die
+903	50031	100
 #
 # id	ani1	ani2	ani3
 #
 [ANIMATION_SETS]
 # MARIO
-1	400	401	402	403	500	501	502	503	599
+1	400	401	402	403	500	501	502	503	599	800	801
 # BRICK 
 2	601
 # QUESTION MARK BRICK 
@@ -311,6 +335,8 @@
 23	603
 # GOOMBA
 3	701	702
+#KOOPAS
+4	901	902	903
 #STREET
 #Startsmall
 41	1
@@ -419,6 +445,8 @@
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba,3=Koopas,4=Street,5=Pipe,6=Invisble,7=box
+#Koopas
+3	590	374	4
 #blackback
 6	2256	528	95
 #goal

@@ -11,7 +11,7 @@
 
 CMario::CMario(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_BIG;
+	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 
@@ -101,6 +101,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						goomba->SetState(GOOMBA_STATE_DIE);
 						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
+					if (goomba->GetState() == GOOMBA_STATE_DIE)
+					{
+						goomba->Clear();
+					}
 				}
 				else if (e->nx != 0)
 				{
@@ -114,7 +118,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 								StartUntouchable();
 							}
 							else
+							{
 								SetState(MARIO_STATE_DIE);
+							}
 						}
 					}
 				}
@@ -155,11 +161,18 @@ void CMario::Render()
 				if (nx > 0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
 				else ani = MARIO_ANI_SMALL_IDLE_LEFT;
 			}
-			else if (vx > 0)
+			else if (vx > 0 )
 				ani = MARIO_ANI_SMALL_WALKING_RIGHT;
-			else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+			else if(vx < 0 )
+				ani = MARIO_ANI_SMALL_WALKING_LEFT;
+			if (vy<0)
+			{
+				if (nx>0)
+					ani = MARIO_ANI_JUMP_RIGHT;
+				if ( nx < 0)
+					ani = MARIO_ANI_JUMP_LEFT;
+			}
 		}
-
 	int alpha = 255;
 	if (untouchable) alpha = 128;
 
