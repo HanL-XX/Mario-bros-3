@@ -1,5 +1,7 @@
 #include "Goomba.h"
 #include <ctime>
+#include "Utils.h"
+
 
 CGoomba::CGoomba()
 {
@@ -10,27 +12,36 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 {
 	left = x;
 	top = y;
-	right = x + GOOMBA_BBOX_WIDTH;
 
 	if (state == GOOMBA_STATE_DIE)
 		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
-	else
+	else 
+	{
 		bottom = y + GOOMBA_BBOX_HEIGHT;
+		right = x + GOOMBA_BBOX_WIDTH;
+	}
 }
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (state == GOOMBA_STATE_BM)
+	{
+		x = NULL;
+		y = NULL;
+		return;
+	}
 	CGameObject::Update(dt, coObjects);
-
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
-
 	coEvents.clear();
-	if(state!=GOOMBA_ANI_DIE)
+	if (state != GOOMBA_STATE_DIE) {
 		CalcPotentialCollisions(coObjects, coEvents);
+	}
+	else
+		return;
 	if (coEvents.size() == 0)
 	{
 		x += dx;
@@ -43,7 +54,8 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		float rdy = 0;
 		CGoomba::FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 	}
-	
+	//DebugOut(L"\nStateUPdate: %d", state);
+
 }
 void CGoomba::FilterCollision(
 	vector<LPCOLLISIONEVENT>& coEvents,
@@ -78,13 +90,19 @@ void CGoomba::FilterCollision(
 void CGoomba::Render()
 {
 	int ani = GOOMBA_ANI_WALKING;
-	if (state == GOOMBA_STATE_DIE) {
+	if (state == GOOMBA_STATE_BM)
+		return;
+	if (state == GOOMBA_STATE_DIE)
+	{
 		ani = GOOMBA_ANI_DIE;
+		if (GetTickCount64() - timedie > GOOMBA_TIME_DIE)
+			SetState(GOOMBA_STATE_BM);
 	}
 
 	animation_set->at(ani)->Render(x, y);
+	//DebugOut(L"\nStateRender: %d", state);
 
-	RenderBoundingBox();
+	//RenderBoundingBox();
 }
 
 void CGoomba::SetState(int state)
@@ -94,16 +112,16 @@ void CGoomba::SetState(int state)
 	{
 	case GOOMBA_STATE_DIE:
 		y += GOOMBA_BBOX_HEIGHT - GOOMBA_BBOX_HEIGHT_DIE + 1;
+		timedie = GetTickCount64();
 		vx = 0;
 		vy = 0;
 		break;
 	case GOOMBA_STATE_WALKING:
 		vx = -GOOMBA_WALKING_SPEED;
+		break;
 	}
 }
 void CGoomba::Clear()
 {
-	
-	this->x = NULL;
-	this->y = NULL;
+	SetState(GOOMBA_STATE_DIE);
 }

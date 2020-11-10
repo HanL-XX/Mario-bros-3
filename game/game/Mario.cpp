@@ -8,13 +8,14 @@
 #include "Goomba.h"
 #include "Portal.h"
 #include"box.h"
+#include "Street.h"
+#include "Coin.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
 	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
-
 	start_x = x;
 	start_y = y;
 	this->x = x;
@@ -22,12 +23,12 @@ CMario::CMario(float x, float y) : CGameObject()
 }
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
-{
-	// Calculate dx, dy 
-	CGameObject::Update(dt);
-
+{	
 	// Simple fall down
 	vy += MARIO_GRAVITY * dt;
+
+	// Calculate dx, dy 
+	CGameObject::Update(dt);
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -50,13 +51,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
+		jump = 1;
 	}
 	else
 	{
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;
-
+		jump = 1;
 		// TODO: This is a very ugly designed function!!!!
 		for (UINT i = 0; i < coEvents.size(); i++)
 		{
@@ -66,13 +68,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				FilterCollisionbox(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 			}
+			else if (dynamic_cast<CCoin*>(e->obj))
+			{
+				FilterCollisioncoin(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+			}
 			else
 				FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 		}
 
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
-		//if (rdx != 0 && rdx!=dx)
-		//	x += nx*abs(rdx); 
+		/*if (rdx != 0 && rdx!=dx)
+			x += nx*abs(rdx); */
 
 		// block every object first!
 		x += min_tx * dx + nx * 0.4f;
@@ -80,7 +86,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		if (nx != 0) vx = 0;
 		if (ny != 0) vy = 0;
-
+		/*if (vy == 0)
+			jump = 0;*/
 
 		//
 		// Collision logic with other objects
@@ -89,6 +96,27 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
 
+			if (e->ny < 0)
+			{
+				jump = 0;
+			}
+
+			if (dynamic_cast<CStreet*>(e->obj))
+			{
+				CStreet* brick = dynamic_cast<CStreet*>(e->obj);
+				/*x += min_tx * dx + nx * 0.4f;
+				y += min_ty * dy + ny * 0.001f;*/
+
+			}
+			if (dynamic_cast<CCoin*>(e->obj))
+			{
+				CCoin* Coin = dynamic_cast<CCoin*>(e->obj);
+
+				if (e->ny != 0||e->nx!=0)
+				{
+					Coin->Clear();
+				}
+			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -98,13 +126,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					if (goomba->GetState() != GOOMBA_STATE_DIE)
 					{
-						goomba->SetState(GOOMBA_STATE_DIE);
+						goomba->Clear();
 						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
-					if (goomba->GetState() == GOOMBA_STATE_DIE)
-					{
-						goomba->Clear();
-					}
+					//if (goomba->GetState() == GOOMBA_STATE_DIE)
+					//{
+					//	goomba->Clear();
+					//}
 				}
 				else if (e->nx != 0)
 				{
@@ -131,8 +159,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
 		}
-	}
 
+	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
@@ -148,24 +176,40 @@ void CMario::Render()
 			if (vx == 0)
 			{
 				if (nx > 0) ani = MARIO_ANI_BIG_IDLE_RIGHT;
-				else ani = MARIO_ANI_BIG_IDLE_LEFT;
+				if (nx < 0) ani = MARIO_ANI_BIG_IDLE_LEFT;
 			}
 			else if (vx > 0)
 				ani = MARIO_ANI_BIG_WALKING_RIGHT;
-			else ani = MARIO_ANI_BIG_WALKING_LEFT;
+			else if(vx<0)
+				ani = MARIO_ANI_BIG_WALKING_LEFT;
+
+			/*if (vy > 0)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_BIG_JUMP_RIGHT_UP;
+				if (nx < 0)
+					ani = MARIO_ANI_BIG_JUMP_LEFT_UP;
+			}
+			if (vy < 0)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_BIG_JUMP_RIGHT_DOWN;
+				if (nx < 0)
+					ani = MARIO_ANI_BIG_JUMP_LEFT_DOWN;
+			}*/
 		}
 		else if (level == MARIO_LEVEL_SMALL)
 		{
-			if (vx == 0)
+			if (vx == 0&&jump==0)
 			{
 				if (nx > 0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
 				else ani = MARIO_ANI_SMALL_IDLE_LEFT;
 			}
-			else if (vx > 0 )
+			else if (vx > 0 && jump == 0)
 				ani = MARIO_ANI_SMALL_WALKING_RIGHT;
-			else if(vx < 0 )
+			else if(vx < 0 && jump == 0)
 				ani = MARIO_ANI_SMALL_WALKING_LEFT;
-			if (vy<0)
+			else if (jump ==1)
 			{
 				if (nx>0)
 					ani = MARIO_ANI_JUMP_RIGHT;

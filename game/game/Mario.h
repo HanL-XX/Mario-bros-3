@@ -4,7 +4,7 @@
 #define MARIO_WALKING_SPEED		0.15f 
 //0.1f
 #define MARIO_JUMP_SPEED_Y		0.5f
-#define MARIO_JUMP_DEFLECT_SPEED 0.2f
+#define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
 
@@ -29,10 +29,15 @@
 #define	MARIO_ANI_JUMP_RIGHT	9
 #define	MARIO_ANI_JUMP_LEFT	10
 
+#define MARIO_ANI_BIG_JUMP_LEFT_DOWN	11
+#define MARIO_ANI_BIG_JUMP_LEFT_UP	12
+#define MARIO_ANI_BIG_JUMP_RIGHT_DOWN	13
+#define MARIO_ANI_BIG_JUMP_RIGHT_UP	14
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 
-#define MARIO_BIG_BBOX_WIDTH  15
+#define MARIO_BIG_BBOX_WIDTH  16
 #define MARIO_BIG_BBOX_HEIGHT 27
 
 #define MARIO_SMALL_BBOX_WIDTH  13
@@ -47,10 +52,13 @@ class CMario : public CGameObject
 	int untouchable;
 	DWORD untouchable_start;
 
+	
+
 	float start_x;			// initial position of Mario at scene
 	float start_y;
 public:
 	CMario(float x = 0.0f, float y = 0.0f);
+
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();
 

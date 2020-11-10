@@ -59,6 +59,8 @@ public:
 	int state;
 
 	DWORD dt;
+	int jump;
+
 
 	LPANIMATION_SET animation_set;
 
@@ -94,7 +96,15 @@ public:
 		float& ny,
 		float& rdx,
 		float& rdy);
-
+	void FilterCollisioncoin(
+		vector<LPCOLLISIONEVENT>& coEvents,
+		vector<LPCOLLISIONEVENT>& coEventsResult,
+		float& min_tx,
+		float& min_ty,
+		float& nx,
+		float& ny,
+		float& rdx,
+		float& rdy);
 	CGameObject();
 
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom) = 0;

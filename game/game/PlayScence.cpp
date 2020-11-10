@@ -10,6 +10,8 @@
 #include "Pipe.h"
 #include "BackInvis.h"
 #include "box.h"
+#include "Coin.h"
+
 
 
 
@@ -41,6 +43,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_PIPE	5
 #define OBJECT_TYPE_INVISIBLE	6
 #define	OBJECT_TYPE_BOX	7	
+#define	OBJECT_TYPE_COIN	8
 
 
 #define OBJECT_TYPE_PORTAL	50
@@ -170,6 +173,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_STREET: obj = new CStreet(); break;
 	case OBJECT_TYPE_PIPE: obj = new CPIPE(); break;
+	case OBJECT_TYPE_COIN:	obj = new CCoin(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
