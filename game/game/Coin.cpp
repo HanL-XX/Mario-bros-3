@@ -27,17 +27,25 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEvents.clear();
 	if (state == COIN_BM)
 	{
-		x = NULL;
-		y = NULL;
 		return;
 	}
 }
 void CCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-	l = x;
-	t = y;
-	r = x + COIN_BBOX_WIDTH;
-	b = y + COIN_BBOX_HEIGHT;
+	if (state == COIN_BM)
+	{
+		l = NULL;
+		t = NULL;
+		r = NULL;
+		b = NULL;
+	}
+	else
+	{
+		l = x;
+		t = y;
+		r = x + COIN_BBOX_WIDTH;
+		b = y + COIN_BBOX_HEIGHT;
+	}
 }
 void CCoin::Clear()
 {

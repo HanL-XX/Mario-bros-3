@@ -12,8 +12,14 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 {
 	left = x;
 	top = y;
-
-	if (state == GOOMBA_STATE_DIE)
+	if (state==GOOMBA_STATE_BM)
+	{
+		left = NULL;
+		top = NULL;
+		right = NULL;
+		bottom = NULL;
+	}
+	else if (state == GOOMBA_STATE_DIE)
 		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
 	else 
 	{
@@ -24,10 +30,9 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
 	if (state == GOOMBA_STATE_BM)
 	{
-		x = NULL;
-		y = NULL;
 		return;
 	}
 	CGameObject::Update(dt, coObjects);
