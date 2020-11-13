@@ -163,6 +163,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+	DebugOut(L"\Vx = %f\n", vx);
+
 }
 
 void CMario::Render()
@@ -206,15 +208,29 @@ void CMario::Render()
 				else ani = MARIO_ANI_SMALL_IDLE_LEFT;
 			}
 			else if (vx > 0 && jump == 0)
-				ani = MARIO_ANI_SMALL_WALKING_RIGHT;
+				if (state == MARIO_STATE_SMALL_RUN_FAST_RIGHT)
+				{
+					ani = MARIO_ANI_SMALL_WALKING_RIGHT;
+				}
+				else
+					ani = MARIO_ANI_SMALL_WALKING_RIGHT;
 			else if(vx < 0 && jump == 0)
-				ani = MARIO_ANI_SMALL_WALKING_LEFT;
+				if (state == MARIO_STATE_SMALL_RUN_FAST_LEFT)
+				{
+					ani = MARIO_ANI_SMALL_WALKING_LEFT;
+				}
+				else
+					ani = MARIO_ANI_SMALL_WALKING_LEFT;
 			else if (jump ==1)
 			{
-				if (nx>0)
+				if (nx > 0)
+				{
 					ani = MARIO_ANI_JUMP_RIGHT;
-				if ( nx < 0)
+				}
+				if (nx < 0)
+				{
 					ani = MARIO_ANI_JUMP_LEFT;
+				}
 			}
 		}
 	int alpha = 255;
@@ -248,6 +264,14 @@ void CMario::SetState(int state)
 		break;
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
+		break;
+	case MARIO_STATE_SMALL_RUN_FAST_LEFT:
+		vx = -MARIO_RUN_SPEED;
+		nx = -1;
+		break;
+	case MARIO_STATE_SMALL_RUN_FAST_RIGHT:
+		vx = MARIO_RUN_SPEED;
+		nx = 1;
 		break;
 	}
 }
