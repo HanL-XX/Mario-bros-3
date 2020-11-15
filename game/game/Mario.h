@@ -7,7 +7,7 @@
 #define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
-#define MARIO_RUN_SPEED	0.3f
+#define MARIO_RUN_SPEED	0.2f
 #define MARIO_RUN_FAST_SPEED	0.3f
 
 
@@ -18,6 +18,9 @@
 #define MARIO_STATE_DIE				400
 #define MARIO_STATE_SMALL_RUN_FAST_RIGHT			500
 #define MARIO_STATE_SMALL_RUN_FAST_LEFT			600
+#define MARIO_STATE_SMALL_RUN_FAST2HAND_RIGHT	700
+#define MARIO_STATE_SMALL_RUN_FAST2HAND_LEFT	800
+
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -43,6 +46,8 @@
 #define MARIO_ANI_SMALL_RUN_FAST_RIGHT 15
 #define MARIO_ANI_SMALL_RUN_FAST_LEFT 16
 
+#define MARIO_ANI_SMALL_RUN_2HAND_RIGHT 17
+#define MARIO_ANI_SMALL_RUN_2HAND_LEFT 18
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -54,15 +59,16 @@
 #define MARIO_SMALL_BBOX_HEIGHT 15
 
 #define MARIO_UNTOUCHABLE_TIME 5000
-
+#define MARIO_TIMERUN_2HAND 600
 
 class CMario : public CGameObject
 {
 	int level;
 	int untouchable;
 	DWORD untouchable_start;
-
-	
+	DWORD timerun;
+	int run;
+	int lastrun;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;

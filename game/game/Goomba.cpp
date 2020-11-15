@@ -30,7 +30,13 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-
+	if (timedie != NULL)
+	{
+		DWORD td = GetTickCount64() - timedie;
+		if (td > GOOMBA_TIME_DIE)
+			SetState(GOOMBA_STATE_BM);
+		//DebugOut(L"\timedie = %f\n", td);
+	}
 	if (state == GOOMBA_STATE_BM)
 	{
 		return;
@@ -100,8 +106,6 @@ void CGoomba::Render()
 	if (state == GOOMBA_STATE_DIE)
 	{
 		ani = GOOMBA_ANI_DIE;
-		if (GetTickCount64() - timedie > GOOMBA_TIME_DIE)
-			SetState(GOOMBA_STATE_BM);
 	}
 
 	animation_set->at(ani)->Render(x, y);
@@ -113,6 +117,7 @@ void CGoomba::Render()
 void CGoomba::SetState(int state)
 {
 	CGameObject::SetState(state);
+	timedie = NULL;
 	switch (state)
 	{
 	case GOOMBA_STATE_DIE:
@@ -125,6 +130,8 @@ void CGoomba::SetState(int state)
 		vx = -GOOMBA_WALKING_SPEED;
 		break;
 	}
+	//DebugOut(L"\nrun = %f\n", timedie);
+
 }
 void CGoomba::Clear()
 {
