@@ -7,8 +7,8 @@
 #define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
-#define MARIO_RUN_SPEED	0.2f
-#define MARIO_RUN_FAST_SPEED	0.3f
+#define MARIO_RUN_SPEED	0.15f
+#define MARIO_RUN_FAST_SPEED	0.25f
 
 
 #define MARIO_STATE_IDLE			0
@@ -20,6 +20,8 @@
 #define MARIO_STATE_SMALL_RUN_FAST_LEFT			600
 #define MARIO_STATE_SMALL_RUN_FAST2HAND_RIGHT	700
 #define MARIO_STATE_SMALL_RUN_FAST2HAND_LEFT	800
+#define MARIO_STATE_SMALL_JUM_FAST	900
+#define MARIO_STATE_SMALL_TURN 1000
 
 
 
@@ -49,6 +51,11 @@
 #define MARIO_ANI_SMALL_RUN_2HAND_RIGHT 17
 #define MARIO_ANI_SMALL_RUN_2HAND_LEFT 18
 
+#define MARIO_ANI_JUM_FAST_RIGHT 19
+#define MARIO_ANI_JUM_FAST_LEFT 20
+#define MARIO_ANI_SMALL_TURN_LEFT 21
+#define MARIO_ANI_SMALL_TURN_RIGHT 22
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 
@@ -59,7 +66,8 @@
 #define MARIO_SMALL_BBOX_HEIGHT 15
 
 #define MARIO_UNTOUCHABLE_TIME 5000
-#define MARIO_TIMERUN_2HAND 600
+#define MARIO_TIMERUN_2HAND 1000
+#define MARIO_TIME_TURN	95
 
 class CMario : public CGameObject
 {
@@ -67,8 +75,12 @@ class CMario : public CGameObject
 	int untouchable;
 	DWORD untouchable_start;
 	DWORD timerun;
+	DWORD timeturn;
 	int run;
 	int lastrun;
+	int turn;
+	int laststate;
+	float lastvx;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -83,6 +95,8 @@ public:
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 
 	void Reset();
+	int GetRun() { return this->run; }
+
 
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };

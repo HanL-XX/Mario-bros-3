@@ -16,6 +16,8 @@ CMario::CMario(float x, float y) : CGameObject()
 	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
+	turn = 0;
+	timeturn = NULL;
 	start_x = x;
 	start_y = y;
 	this->x = x;
@@ -34,10 +36,24 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
-
+	//turn = 0;
 	// turn off collision when die 
 	if (state != MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
+	if (timeturn)
+	{
+		if (GetTickCount64() - timeturn <= MARIO_TIME_TURN)
+		{
+			SetState(MARIO_STATE_SMALL_TURN);
+			turn = 1;
+			//DebugOut(L"vx = %f\n", turn);
+		}
+		else
+		{
+			timeturn = NULL;
+			turn = 0;
+		}
+	}
 	if (timerun)
 	{
 		if (GetTickCount64() - timerun > MARIO_TIMERUN_2HAND)
@@ -170,6 +186,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	//DebugOut(L"vx = %f\n", state);
 }
 
 void CMario::Render()
@@ -207,8 +225,16 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_SMALL)
 		{
-			if (run == 1)
+			if (turn==1)
 			{
+				if (nx < 0)
+					ani = MARIO_ANI_SMALL_TURN_LEFT;
+				else
+					ani = MARIO_ANI_SMALL_TURN_RIGHT;
+			}
+			else if (run == 1 && jump != 1)
+			{
+
 				if (nx > 0)	ani = MARIO_ANI_SMALL_RUN_2HAND_RIGHT;
 				else
 				{
@@ -238,13 +264,23 @@ void CMario::Render()
 						ani = MARIO_ANI_SMALL_WALKING_LEFT;
 				else if (jump == 1)
 				{
-					if (nx > 0)
+					if (run == 1)
 					{
-						ani = MARIO_ANI_JUMP_RIGHT;
+						if (nx > 0)
+							ani = MARIO_ANI_JUM_FAST_RIGHT;
+						if (nx < 0)
+							ani = MARIO_ANI_JUM_FAST_LEFT;
 					}
-					if (nx < 0)
+					else
 					{
-						ani = MARIO_ANI_JUMP_LEFT;
+						if (nx > 0)
+						{
+							ani = MARIO_ANI_JUMP_RIGHT;
+						}
+						if (nx < 0)
+						{
+							ani = MARIO_ANI_JUMP_LEFT;
+						}
 					}
 				}
 			}
@@ -260,71 +296,129 @@ void CMario::Render()
 void CMario::SetState(int state)
 {
 	CGameObject::SetState(state);
-	switch (state)
+	if (jump == 1)
 	{
-	case MARIO_STATE_WALKING_RIGHT:
-		vx = MARIO_WALKING_SPEED;
-		nx = 1;
-		lastrun = 0;
-		timerun = NULL;
-		run = 0;
-		break;
-	case MARIO_STATE_WALKING_LEFT:
-		vx = -MARIO_WALKING_SPEED;
-		nx = -1;
-		lastrun = 0;
-		timerun = NULL;
-		run = 0;
-		break;
-	case MARIO_STATE_JUMP:
-		// TODO: need to check if Mario is *current* on a platform before allowing to jump again
-		vy = -MARIO_JUMP_SPEED_Y;
-		lastrun = 0;
-		timerun = NULL;
-		run = 0;
-		break;
-	case MARIO_STATE_IDLE:
-		vx = 0;
-		lastrun = 0;
-		timerun = NULL;
-		run = 0;
-		break;
-	case MARIO_STATE_DIE:
-		vy = -MARIO_DIE_DEFLECT_SPEED;
-		lastrun = 0;
-		timerun = NULL;
-		run = 0;
-		break;
-	case MARIO_STATE_SMALL_RUN_FAST_LEFT:
-		if (lastrun == 0)
-		{
-			timerun = GetTickCount64();
-			vx = -MARIO_RUN_SPEED;
-			nx = -1;
-			lastrun = 1;
-		}
-		else
-		{
-			vx = -MARIO_RUN_FAST_SPEED;
-			nx = -1;
-		}
-		break;
-	case MARIO_STATE_SMALL_RUN_FAST_RIGHT:
-		if (lastrun == 0)
-		{
-			timerun = GetTickCount64();
-			vx = MARIO_RUN_SPEED;
-			nx = 1;
-			lastrun = 1;
-		}
-		else
-		{
-			vx = MARIO_RUN_FAST_SPEED;
-			nx = 1;
-		}
-		break;
+		turn = 0;
+		timeturn = NULL;
 	}
-	DebugOut(L"run = %f\n", vx);
+	if (!timeturn)
+	{
+		switch (state)
+		{
+		case MARIO_STATE_WALKING_RIGHT:
+			vx = MARIO_WALKING_SPEED;
+			nx = 1;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			break;
+		case MARIO_STATE_WALKING_LEFT:
+			vx = -MARIO_WALKING_SPEED;
+			nx = -1;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			break;
+		case MARIO_STATE_JUMP:
+			// TODO: need to check if Mario is *current* on a platform before allowing to jump again
+			vy = -MARIO_JUMP_SPEED_Y;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			break;
+		case MARIO_STATE_IDLE:
+			vx = 0;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			break;
+		case MARIO_STATE_DIE:
+			vy = -MARIO_DIE_DEFLECT_SPEED;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			break;
+		case MARIO_STATE_SMALL_RUN_FAST_LEFT:
+			if (lastrun == 0)
+			{
+				timerun = GetTickCount64();
+				vx = -MARIO_RUN_SPEED;
+				nx = -1;
+				timeturn = NULL;
+				turn = 0;
+				lastrun = 1;
+			}
+			else
+			{
+				vx = -MARIO_RUN_SPEED;
+				timeturn = NULL;
+				nx = -1;
+				turn = 0;
+				if (run == 1)
+				{
+					vx = -MARIO_RUN_FAST_SPEED;
+				}
+			}
+			break;
+		case MARIO_STATE_SMALL_RUN_FAST_RIGHT:
+			if (lastrun == 0)
+			{
+				timerun = GetTickCount64();
+				vx = MARIO_RUN_SPEED;
+				nx = 1;
+				timeturn = NULL;
+				turn = 0;
+				lastrun = 1;
+			}
+			else
+			{
+				vx = MARIO_RUN_SPEED;
+				timeturn = NULL;
+				turn = 0;
+				nx = 1;
+				if (run == 1)
+				{
+					vx = MARIO_RUN_FAST_SPEED;
+				}
+			}
+			break;
+		case MARIO_STATE_SMALL_JUM_FAST:
+			vy = -MARIO_JUMP_SPEED_Y;
+			timeturn = NULL;
+			turn = 0;
+			break;
+		case MARIO_STATE_SMALL_TURN:
+			vx = 0;
+			lastrun = 0;
+			timerun = NULL;
+			run = 0;
+			turn = 1;
+			break;
+		}
+	}
+	if (lastvx * vx < 0)
+	{
+		timeturn = GetTickCount64();
+		turn = 1;
+	}
+	if (timeturn)
+	{
+		vx = 0;
+		timerun = 0;
+		lastrun = NULL;
+		run = 0;
+		turn = 1;
+	}
+	lastvx = vx;
 }
 
 void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom)
