@@ -330,7 +330,8 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 		mario->SetState(MARIO_STATE_SMALL_JUM_FAST);
 		DebugOut(L"run = %f\n", mario->GetRun());
 	}
-	else*/ if (game->IsKeyDown(DIK_RIGHT)&&downz != 1)
+	else*/ 
+	if (game->IsKeyDown(DIK_RIGHT)&&downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_LEFT);

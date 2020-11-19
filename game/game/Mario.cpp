@@ -59,7 +59,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (GetTickCount64() - timerun > MARIO_TIMERUN_2HAND)
 		{
 			run = 1;
-			vx = MARIO_RUN_FAST_SPEED;
 		}
 		//DebugOut(L"\count = %f\n", GetTickCount64());
 	}
@@ -186,7 +185,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-
 	//DebugOut(L"vx = %f\n", state);
 }
 
@@ -198,30 +196,57 @@ void CMario::Render()
 	else
 		if (level == MARIO_LEVEL_BIG)
 		{
-			if (vx == 0)
+			/*if (run == 1 && jump != 1)
 			{
-				if (nx > 0) ani = MARIO_ANI_BIG_IDLE_RIGHT;
-				if (nx < 0) ani = MARIO_ANI_BIG_IDLE_LEFT;
-			}
-			else if (vx > 0)
-				ani = MARIO_ANI_BIG_WALKING_RIGHT;
-			else if(vx<0)
-				ani = MARIO_ANI_BIG_WALKING_LEFT;
-
-			/*if (vy > 0)
-			{
-				if (nx > 0)
-					ani = MARIO_ANI_BIG_JUMP_RIGHT_UP;
 				if (nx < 0)
-					ani = MARIO_ANI_BIG_JUMP_LEFT_UP;
+					ani = MARIO_ANI_BIG_RUN_LEFT;
+				else
+					ani = MARIO_ANI_BIG_RUN_RIGHT;
 			}
-			if (vy < 0)
+			else*/ 
+			if (jump == 1)
 			{
-				if (nx > 0)
-					ani = MARIO_ANI_BIG_JUMP_RIGHT_DOWN;
-				if (nx < 0)
-					ani = MARIO_ANI_BIG_JUMP_LEFT_DOWN;
-			}*/
+				if (vy < 0)
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_BIG_JUMP_RIGHT_UP;
+					else
+						ani = MARIO_ANI_BIG_JUMP_LEFT_UP;
+				}
+				else
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_BIG_JUMP_RIGHT_DOWN;
+					else
+						ani = MARIO_ANI_BIG_JUMP_LEFT_DOWN;
+				}
+			}
+			else
+			{
+				if (vx == 0)
+				{
+					if (nx > 0) ani = MARIO_ANI_BIG_IDLE_RIGHT;
+					if (nx < 0) ani = MARIO_ANI_BIG_IDLE_LEFT;
+				}
+				else if (vx > 0)
+				{
+					if (state == MARIO_STATE_SMALL_RUN_FAST_RIGHT)
+					{
+						ani = MARIO_ANI_BIG_RUN_RIGHT;
+					}
+					else
+						ani = MARIO_ANI_BIG_WALKING_RIGHT;
+				}
+				else if (vx < 0)
+				{
+					if (state == MARIO_STATE_SMALL_RUN_FAST_LEFT)
+					{
+						ani = MARIO_ANI_BIG_RUN_LEFT;
+					}
+					else
+						ani = MARIO_ANI_BIG_WALKING_LEFT;
+				}
+			}
 		}
 		else if (level == MARIO_LEVEL_SMALL)
 		{
