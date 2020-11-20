@@ -306,8 +306,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	switch (KeyCode)
 	{
 	case DIK_X:
-		mario->SetState(MARIO_STATE_JUMP);
+	{
+		if (mario->GetState() == MARIO_STATE_BOW||mario->GetState()== MARIO_STATE_BOW_JUMP)
+			mario->SetState(MARIO_STATE_BOW_JUMP);
+		else
+			mario->SetState(MARIO_STATE_JUMP);
 		break;
+	}
 	case DIK_A:
 		mario->Reset();
 		break;
@@ -325,20 +330,17 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	{
 		downz = 1;
 	}
-	/*if (mario->GetRun() == 0 && game->IsKeyDown(DIK_X))
-	{
-		mario->SetState(MARIO_STATE_SMALL_JUM_FAST);
-		DebugOut(L"run = %f\n", mario->GetRun());
-	}
-	else*/ 
-	if (game->IsKeyDown(DIK_RIGHT)&&downz != 1)
+
+	if (game->IsKeyDown(DIK_RIGHT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_LEFT);
-	else if (game->IsKeyDown(DIK_LEFT) && downz==1)
+	else if (game->IsKeyDown(DIK_LEFT) && downz == 1)
 		mario->SetState(MARIO_STATE_SMALL_RUN_FAST_LEFT);
 	else if (game->IsKeyDown(DIK_RIGHT) && downz == 1)
 		mario->SetState(MARIO_STATE_SMALL_RUN_FAST_RIGHT);
+	else if (game->IsKeyDown(DIK_DOWN)&&mario->GetBoWJump()==0)
+		mario->SetState(MARIO_STATE_BOW);
 	else
 		mario->SetState(MARIO_STATE_IDLE);
 }

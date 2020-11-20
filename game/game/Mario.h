@@ -22,6 +22,8 @@
 #define MARIO_STATE_SMALL_RUN_FAST2HAND_LEFT	800
 #define MARIO_STATE_SMALL_JUM_FAST	900
 #define MARIO_STATE_SMALL_TURN 1000
+#define MARIO_STATE_BOW	1001
+#define MARIO_STATE_BOW_JUMP 1002
 
 
 
@@ -59,11 +61,26 @@
 #define MARIO_ANI_BIG_RUN_LEFT	23
 #define MARIO_ANI_BIG_RUN_RIGHT	24
 
+#define MARIO_ANI_BIG_RUN2HAND_RIGHT	25
+#define MARIO_ANI_BIG_RUN2HAND_LEFT	26
+
+#define MARIO_ANI_BIG_TURN_RIGHT	27
+#define MARIO_ANI_BIG_TURN_LEFT	28
+
+#define MARIO_ANI_BIG_JUMP_RIGHT	29
+#define MARIO_ANI_BIG_JUMP_LEFT	30
+
+#define	MARI_ANI_BIG_BOW_RIGHT	31
+#define	MARI_ANI_BIG_BOW_LEFT	32
+
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 
 #define MARIO_BIG_BBOX_WIDTH  16
 #define MARIO_BIG_BBOX_HEIGHT 27
+
+#define MARIO_BIG_BBOX_BOW_WIDTH  14
+#define MARIO_BIG_BBOX_BOW_HEIGHT 18
 
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 15
@@ -84,6 +101,9 @@ class CMario : public CGameObject
 	int turn;
 	int laststate;
 	float lastvx;
+	float lastafterbow_x;
+	float lastafterbow_y;
+	int bowjump;
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -99,7 +119,7 @@ public:
 
 	void Reset();
 	int GetRun() { return this->run; }
-
+	int GetBoWJump() { return this->bowjump; }
 
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };

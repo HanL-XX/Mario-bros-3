@@ -28,7 +28,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {	
 	// Simple fall down
 	vy += MARIO_GRAVITY * dt;
-
 	// Calculate dx, dy 
 	CGameObject::Update(dt);
 
@@ -38,6 +37,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEvents.clear();
 	//turn = 0;
 	// turn off collision when die 
+	if (state != MARIO_STATE_BOW)
+	{
+		lastafterbow_x = x;
+		lastafterbow_y = y;
+	}
 	if (state != MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 	if (timeturn)
@@ -185,7 +189,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-	//DebugOut(L"vx = %f\n", state);
 }
 
 void CMario::Render()
@@ -196,29 +199,52 @@ void CMario::Render()
 	else
 		if (level == MARIO_LEVEL_BIG)
 		{
-			/*if (run == 1 && jump != 1)
+			if (state == MARIO_STATE_BOW||state== MARIO_STATE_BOW_JUMP)
+			{
+				if (nx > 0)
+					ani = MARI_ANI_BIG_BOW_RIGHT;
+				else
+					ani = MARI_ANI_BIG_BOW_LEFT;
+			}
+			else if (turn == 1)
 			{
 				if (nx < 0)
-					ani = MARIO_ANI_BIG_RUN_LEFT;
+					ani = MARIO_ANI_BIG_TURN_LEFT;
 				else
-					ani = MARIO_ANI_BIG_RUN_RIGHT;
+					ani = MARIO_ANI_BIG_TURN_RIGHT;
 			}
-			else*/ 
-			if (jump == 1)
+			else if (run == 1 && jump != 1)
 			{
-				if (vy < 0)
+				if (nx < 0)
+					ani = MARIO_ANI_BIG_RUN2HAND_LEFT;
+				else
+					ani = MARIO_ANI_BIG_RUN2HAND_RIGHT;
+			}
+			else if (jump == 1)
+			{
+				if (run == 1)
 				{
 					if (nx > 0)
-						ani = MARIO_ANI_BIG_JUMP_RIGHT_UP;
+						ani = MARIO_ANI_BIG_JUMP_RIGHT;
 					else
-						ani = MARIO_ANI_BIG_JUMP_LEFT_UP;
+						ani = MARIO_ANI_BIG_JUMP_LEFT;
 				}
 				else
 				{
-					if (nx > 0)
-						ani = MARIO_ANI_BIG_JUMP_RIGHT_DOWN;
+					if (vy < 0)
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_BIG_JUMP_RIGHT_UP;
+						else
+							ani = MARIO_ANI_BIG_JUMP_LEFT_UP;
+					}
 					else
-						ani = MARIO_ANI_BIG_JUMP_LEFT_DOWN;
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_BIG_JUMP_RIGHT_DOWN;
+						else
+							ani = MARIO_ANI_BIG_JUMP_LEFT_DOWN;
+					}
 				}
 			}
 			else
@@ -320,11 +346,41 @@ void CMario::Render()
 
 void CMario::SetState(int state)
 {
+	
+	if (state == MARIO_STATE_BOW && jump == 1)
+		return;
+	
 	CGameObject::SetState(state);
 	if (jump == 1)
 	{
 		turn = 0;
 		timeturn = NULL;
+	}
+	else
+		bowjump = 0;
+	if (bowjump == 1)
+	{
+		switch (state)
+		{
+		case MARIO_STATE_WALKING_RIGHT:
+			vx = MARIO_WALKING_SPEED;
+			nx = 1;
+			break;
+		case MARIO_STATE_WALKING_LEFT:
+			vx = -MARIO_WALKING_SPEED;
+			nx = -1;
+			break;
+		case MARIO_STATE_SMALL_RUN_FAST_LEFT:
+			vx = -MARIO_WALKING_SPEED;
+			nx = -1;
+			break;
+		case MARIO_STATE_SMALL_RUN_FAST_RIGHT:
+			vx = MARIO_WALKING_SPEED;
+			nx = 1;
+			break;
+			break;
+		}
+		CGameObject::SetState(MARIO_STATE_BOW_JUMP);
 	}
 	if (!timeturn)
 	{
@@ -428,12 +484,40 @@ void CMario::SetState(int state)
 			run = 0;
 			turn = 1;
 			break;
+		case MARIO_STATE_BOW:
+			vx = 0;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			break;
+		case MARIO_STATE_BOW_JUMP:
+			vy = -MARIO_JUMP_SPEED_Y;
+			vx = 0;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
+			run = 0;
+			bowjump = 1;
+			break;
+		}
+	}
+	if (laststate)
+	{
+		if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW||laststate==MARIO_STATE_BOW_JUMP&&state!= MARIO_STATE_BOW_JUMP)
+		{
+			SetPosition(x, y+ MARIO_BIG_BBOX_BOW_HEIGHT- MARIO_BIG_BBOX_HEIGHT);
 		}
 	}
 	if (lastvx * vx < 0)
 	{
-		timeturn = GetTickCount64();
-		turn = 1;
+		if (state != MARIO_STATE_BOW_JUMP)
+		{
+			timeturn = GetTickCount64();
+			turn = 1;
+		}
 	}
 	if (timeturn)
 	{
@@ -444,6 +528,8 @@ void CMario::SetState(int state)
 		turn = 1;
 	}
 	lastvx = vx;
+	laststate = state;
+	DebugOut(L"\nbowjum = %i", bowjump);
 }
 
 void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -453,8 +539,16 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 
 	if (level == MARIO_LEVEL_BIG)
 	{
-		right = x + MARIO_BIG_BBOX_WIDTH;
-		bottom = y + MARIO_BIG_BBOX_HEIGHT;
+		if (state == MARIO_STATE_BOW)
+		{
+			right = x + MARIO_BIG_BBOX_BOW_WIDTH;
+			bottom = y + MARIO_BIG_BBOX_BOW_HEIGHT;
+		}
+		else
+		{
+			right = x + MARIO_BIG_BBOX_WIDTH;
+			bottom = y + MARIO_BIG_BBOX_HEIGHT;
+		}
 	}
 	else
 	{
