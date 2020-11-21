@@ -529,7 +529,7 @@ void CMario::SetState(int state)
 	}
 	lastvx = vx;
 	laststate = state;
-	DebugOut(L"\nbowjum = %i", bowjump);
+	//DebugOut(L"\nbowjum = %i", bowjump);
 }
 
 void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom)
