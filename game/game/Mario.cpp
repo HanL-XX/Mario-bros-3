@@ -38,11 +38,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEvents.clear();
 	//turn = 0;
 	// turn off collision when die 
-	if (state != MARIO_STATE_BOW)
-	{
-		lastafterbow_x = x;
-		lastafterbow_y = y;
-	}
+	//if (state != MARIO_STATE_BOW)
+	//{
+	//	lastafterbow_x = x;
+	//	lastafterbow_y = y;
+	//}
 	if (state != MARIO_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 	if (timeturn)
@@ -65,8 +65,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			run = 1;
 		}
+		else
+			run = 0;
 		//DebugOut(L"\count = %f\n", GetTickCount64());
 	}
+	else
+		run = 0;
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
 	{
@@ -122,7 +126,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-
+			if (e->ny != 0)
+				checkS = 1;
 			if (e->ny < 0)
 			{
 				jump = 0;
@@ -198,14 +203,91 @@ void CMario::Render()
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
 	else
-		if (level == MARIO_LEVEL_FIRE)
+		if (level == MARIO_LEVEL_TAIL)
 		{
 			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP)
 			{
 				if (nx > 0)
-					ani = MARIO_ANI_BOW_RIGHT;
+					ani = MARIO_ANI_TAIL_BOW_RIGHT;
 				else
-					ani = MARIO_ANI_BOW_LEFT;
+					ani = MARIO_ANI_TAIL_BOW_LEFT;
+			}
+			else if (turn == 1)
+			{
+				if (nx < 0)
+					ani = MARIO_ANI_TAIL_TURN_LEFT;
+				else
+					ani = MARIO_ANI_TAIL_TURN_RIGHT;
+			}
+			else if (run == 1 && jump != 1)
+			{
+				if (nx < 0)
+					ani = MARIO_ANI_TAIL_2HAND_LEFT;
+				else
+					ani = MARIO_ANI_TAIL_2HAND_RIGHT;
+			}
+			else if (jump == 1)
+			{
+				if (run == 1)
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_FIRE_JUM_FAST_RIGHT;
+					else
+						ani = MARIO_ANI_FIRE_JUM_FAST_LEFT;
+				}
+				else
+				{
+					if (vy < 0)
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_TAIL_JUMP_UP_RIGHT;
+						else
+							ani = MARIO_ANI_TAIL_JUMP_UP_LEFT;
+					}
+					else
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_TAIL_JUMP_DOWN_RIGHT;
+						else
+							ani = MARIO_ANI_TAIL_JUMP_DOWN_LEFT;
+					}
+				}
+			}
+			else
+			{
+				if (vx == 0)
+				{
+					if (nx > 0) ani = MARIO_ANI_TAIL_IDE_RIGHT;
+					if (nx < 0) ani = MARIO_ANI_TAIL_IDE_LEFT;
+				}
+				else if (vx > 0)
+				{
+					if (state == MARIO_STATE_SMALL_RUN_FAST_RIGHT)
+					{
+						ani = MARIO_ANI_TAIL_RUN_RIGHT;
+					}
+					else
+						ani = MARIO_ANI_TAIL_WALK_RIGHT;
+				}
+				else if (vx < 0)
+				{
+					if (state == MARIO_STATE_SMALL_RUN_FAST_LEFT)
+					{
+						ani = MARIO_ANI_TAIL_RUN_LEFT;
+					}
+					else
+						ani = MARIO_ANI_TAIL_WALK_LEFT;
+				}
+			}
+		}
+		else if (level == MARIO_LEVEL_FIRE)
+		{
+			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_FIRE_BOW_RIGHT;
+				else
+					ani = MARIO_ANI_FIRE_BOW_LEFT;
 			}
 			else if (turn == 1)
 			{
@@ -226,9 +308,9 @@ void CMario::Render()
 				if (run == 1)
 				{
 					if (nx > 0)
-						ani = MARIO_ANI_JUM_FAST_RIGHT;
+						ani = MARIO_ANI_FIRE_JUM_FAST_RIGHT;
 					else
-						ani = MARIO_ANI_JUM_FAST_LEFT;
+						ani = MARIO_ANI_FIRE_JUM_FAST_LEFT;
 				}
 				else
 				{
@@ -467,26 +549,44 @@ void CMario::SetState(int state)
 		case MARIO_STATE_WALKING_RIGHT:
 			vx = MARIO_WALKING_SPEED;
 			nx = 1;
-			lastrun = 0;
-			timerun = NULL;
+			if (jump == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
 			break;
 		case MARIO_STATE_WALKING_LEFT:
 			vx = -MARIO_WALKING_SPEED;
 			nx = -1;
-			lastrun = 0;
-			timerun = NULL;
+			if (jump == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
 			break;
 		case MARIO_STATE_JUMP:
 			// TODO: need to check if Mario is *current* on a platform before allowing to jump again
 			vy = -MARIO_JUMP_SPEED_Y;
-			lastrun = 0;
-			timerun = NULL;
+			if (run == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
+			timeturn = NULL;
+			turn = 0;
+			break;
+		case MARIO_STATE_JUM_SLOMOTION:
+			// TODO: need to check if Mario is *current* on a platform before allowing to jump again
+			vy = -MARIO_JUMP_SPEED_Y_SLOMOTION;
+			if (run == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
 			timeturn = NULL;
 			turn = 0;
 			break;
@@ -496,7 +596,6 @@ void CMario::SetState(int state)
 			timerun = NULL;
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
 			break;
 		case MARIO_STATE_DIE:
 			vy = -MARIO_DIE_DEFLECT_SPEED;
@@ -504,7 +603,6 @@ void CMario::SetState(int state)
 			timerun = NULL;
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
 			break;
 		case MARIO_STATE_SMALL_RUN_FAST_LEFT:
 			if (lastrun == 0)
@@ -559,7 +657,6 @@ void CMario::SetState(int state)
 			vx = 0;
 			lastrun = 0;
 			timerun = NULL;
-			run = 0;
 			turn = 1;
 			break;
 		case MARIO_STATE_BOW:
@@ -568,7 +665,6 @@ void CMario::SetState(int state)
 			timerun = NULL;
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
 			break;
 		case MARIO_STATE_BOW_JUMP:
 			vy = -MARIO_JUMP_SPEED_Y;
@@ -577,16 +673,34 @@ void CMario::SetState(int state)
 			timerun = NULL;
 			timeturn = NULL;
 			turn = 0;
-			run = 0;
+			bowjump = 1;
+			break;
+		case MARIO_STATE_BOW_JUMP_SLOMOTION:
+			vy = -MARIO_JUMP_SPEED_Y_SLOMOTION;
+			vx = 0;
+			lastrun = 0;
+			timerun = NULL;
+			timeturn = NULL;
+			turn = 0;
 			bowjump = 1;
 			break;
 		}
 	}
 	if (laststate)
 	{
-		if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW||laststate==MARIO_STATE_BOW_JUMP&&state!= MARIO_STATE_BOW_JUMP)
+		if (level == MARIO_LEVEL_BIG||level==MARIO_LEVEL_FIRE)
 		{
-			SetPosition(x, y+ MARIO_BIG_BBOX_BOW_HEIGHT- MARIO_BIG_BBOX_HEIGHT);
+			if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW || laststate == MARIO_STATE_BOW_JUMP && state != MARIO_STATE_BOW_JUMP)
+			{
+				SetPosition(x, y + MARIO_BIG_BBOX_BOW_HEIGHT - MARIO_BIG_BBOX_HEIGHT);
+			}
+		}
+		if (level == MARIO_LEVEL_TAIL)
+		{
+			if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW || laststate == MARIO_STATE_BOW_JUMP && state != MARIO_STATE_BOW_JUMP)
+			{
+				SetPosition(x, y + MARIO_TAIL_BOW_BBOX_HEIGHT - MARIO_TAIL_BBOX_HEIGHT);
+			}
 		}
 	}
 	if (lastvx * vx < 0)
@@ -600,22 +714,33 @@ void CMario::SetState(int state)
 	if (timeturn)
 	{
 		vx = 0;
-		timerun = 0;
-		lastrun = NULL;
-		run = 0;
+		timerun = NULL;
+		lastrun = 0;
 		turn = 1;
 	}
 	lastvx = vx;
 	laststate = state;
-	//DebugOut(L"\nbowjum = %i", bowjump);
+	//DebugOut(L"\nVx = %f", y);
 }
 
 void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	left = x;
 	top = y;
-
-	if (level == MARIO_LEVEL_FIRE)
+	if (level == MARIO_LEVEL_TAIL)
+	{
+		if (state == MARIO_STATE_BOW)
+		{
+			right = x + MARIO_TAIL_BOW_BBOX_WIDTH;
+			bottom = y + MARIO_TAIL_BOW_BBOX_HEIGHT;
+		}
+		else
+		{
+			right = x + MARIO_TAIL_BBOX_WIDTH;
+			bottom = y + MARIO_TAIL_BBOX_HEIGHT;
+		}
+	}
+	else if (level == MARIO_LEVEL_FIRE)
 	{
 		if (state == MARIO_STATE_BOW)
 		{
@@ -654,7 +779,7 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 void CMario::Reset()
 {
 	SetState(MARIO_STATE_IDLE);
-	SetLevel(MARIO_LEVEL_BIG);
+	SetLevel(MARIO_LEVEL_TAIL);
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
 }

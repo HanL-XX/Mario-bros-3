@@ -4,11 +4,14 @@
 #define MARIO_WALKING_SPEED		0.1f 
 //0.1f
 #define MARIO_JUMP_SPEED_Y		0.5f
+#define MARIO_JUMP_SPEED_Y_SLOMOTION	0.3f
 #define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
 #define MARIO_RUN_SPEED	0.15f
 #define MARIO_RUN_FAST_SPEED	0.25f
+
+#define MARIO_JUMP_HIGH	70
 
 
 #define MARIO_STATE_IDLE			0
@@ -24,7 +27,8 @@
 #define MARIO_STATE_SMALL_TURN 1000
 #define MARIO_STATE_BOW	1001
 #define MARIO_STATE_BOW_JUMP 1002
-
+#define MARIO_STATE_BOW_JUMP_SLOMOTION 1003
+#define MARIO_STATE_JUM_SLOMOTION	1004
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -87,14 +91,32 @@
 #define MARIO_ANI_FIRE_JUMP_DOWN_RIGHT 44
 #define MARIO_ANI_FIRE_JUMP_UP_LEFT 45
 #define MARIO_ANI_FIRE_JUMP_DOWN_LEFT 46
-#define MARIO_ANI_BOW_RIGHT	47
-#define MARIO_ANI_BOW_LEFT	48
-#define MARIO_ANI_JUM_FAST_RIGHT	49
-#define MARIO_ANI_JUM_FAST_LEFT		50
+#define MARIO_ANI_FIRE_BOW_RIGHT	47
+#define MARIO_ANI_FIRE_BOW_LEFT	48
+#define MARIO_ANI_FIRE_JUM_FAST_RIGHT	49
+#define MARIO_ANI_FIRE_JUM_FAST_LEFT		50
+
+#define MARIO_ANI_TAIL_IDE_RIGHT 51
+#define MARIO_ANI_TAIL_IDE_LEFT 52
+#define MARIO_ANI_TAIL_WALK_RIGHT	53
+#define MARIO_ANI_TAIL_WALK_LEFT	54
+#define MARIO_ANI_TAIL_RUN_RIGHT 55
+#define MARIO_ANI_TAIL_RUN_LEFT 56
+#define MARIO_ANI_TAIL_2HAND_RIGHT 57
+#define MARIO_ANI_TAIL_2HAND_LEFT 58
+#define MARIO_ANI_TAIL_TURN_RIGHT 59
+#define MARIO_ANI_TAIL_TURN_LEFT	60
+#define MARIO_ANI_TAIL_BOW_RIGHT 61
+#define MARIO_ANI_TAIL_BOW_LEFT 62
+#define MARIO_ANI_TAIL_JUMP_UP_RIGHT 63
+#define MARIO_ANI_TAIL_JUMP_DOWN_RIGHT 64
+#define MARIO_ANI_TAIL_JUMP_UP_LEFT	65
+#define MARIO_ANI_TAIL_JUMP_DOWN_LEFT	66
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
 #define MARIO_LEVEL_FIRE	3
+#define MARIO_LEVEL_TAIL	4
 
 #define MARIO_BIG_BBOX_WIDTH  16
 #define MARIO_BIG_BBOX_HEIGHT 27
@@ -104,6 +126,12 @@
 
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 15
+
+#define MARIO_TAIL_BBOX_WIDTH	21
+#define MARIO_TAIL_BBOX_HEIGHT	28
+
+#define MARIO_TAIL_BOW_BBOX_WIDTH	21
+#define MARIO_TAIL_BOW_BBOX_HEIGHT	18
 
 #define MARIO_UNTOUCHABLE_TIME 5000
 #define MARIO_TIMERUN_2HAND 1000
@@ -124,6 +152,9 @@ class CMario : public CGameObject
 	float lastafterbow_x;
 	float lastafterbow_y;
 	int bowjump;
+	float checkfallY;
+	int checkS;
+
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -140,6 +171,22 @@ public:
 	void Reset();
 	int GetRun() { return this->run; }
 	int GetBoWJump() { return this->bowjump; }
-
+	int GetJump() { return this->jump; }
+	int CheckFall() 
+	{
+		if (jump == 0)
+		{
+			checkfallY = y;
+			checkS = 0;
+		}
+		if (checkfallY - this->y >= MARIO_JUMP_HIGH)
+		{
+			checkS = 1;
+			return 1;
+		}
+		else
+			return 0;
+	}
+	int CheckS() { return this->checkS; }
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };

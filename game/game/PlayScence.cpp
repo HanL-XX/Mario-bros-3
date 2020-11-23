@@ -307,13 +307,18 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	{
 	case DIK_X:
 	{
-		if (mario->GetState() == MARIO_STATE_BOW||mario->GetState()== MARIO_STATE_BOW_JUMP)
-			mario->SetState(MARIO_STATE_BOW_JUMP);
+		if (mario->GetJump() == 1)
+			break;
 		else
-			mario->SetState(MARIO_STATE_JUMP);
-		break;
+		{
+			if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
+				mario->SetState(MARIO_STATE_BOW_JUMP);
+			else
+				mario->SetState(MARIO_STATE_JUMP);
+			break;
+		}
 	}
-	case DIK_A:
+	case DIK_R:
 		mario->Reset();
 		break;
 	}
@@ -326,11 +331,21 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	int downz = 0;
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	if (game->IsKeyDown(DIK_Z))
+	if (game->IsKeyDown(DIK_A))
 	{
 		downz = 1;
 	}
-
+	if (game->IsKeyDown(DIK_S))
+	{
+		if (mario->CheckFall() == 0&&mario->CheckS()==0)
+		{
+			if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
+				mario->SetState(MARIO_STATE_BOW_JUMP_SLOMOTION);
+			else
+				mario->SetState(MARIO_STATE_JUM_SLOMOTION);
+			DebugOut(L"\nVx = %i", mario->CheckS());
+		}
+	}
 	if (game->IsKeyDown(DIK_RIGHT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT) && downz != 1)
