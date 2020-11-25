@@ -11,6 +11,7 @@
 #include "BackInvis.h"
 #include "box.h"
 #include "Coin.h"
+#include "Mario.h"
 
 
 
@@ -250,9 +251,6 @@ void CPlayScene::Load()
 
 void CPlayScene::Update(DWORD dt)
 {
-	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
-
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
 	{
@@ -270,12 +268,44 @@ void CPlayScene::Update(DWORD dt)
 	// Update camera to follow mario
 	float cx, cy;
 	player->GetPosition(cx, cy);
-
+	DebugOut(L"\ncy = %f", cy);
 	CGame* game = CGame::GetInstance();
-	cx -= game->GetScreenWidth() / 2;
-	cy -= game->GetScreenHeight() / 2;
+	/*
+	if (!leftM || !rightM)
+	{
+		rightM = cx;
+		leftM = cx - 50;
+	}*/
 
-	CGame::GetInstance()->SetCamPos(round(cx),round(cy));
+	if (cy > 385 - game->GetScreenHeight() / 2)
+	{
+		cy =385 - game->GetScreenHeight() / 2;
+	}
+	if (cx >= START_CAM_X +game->GetScreenWidth() / 2)
+	{
+		/*if (cx<=leftM || cx>=rightM)
+			cx -= game->GetScreenWidth() / 2;
+		else
+			cx = lastcx;*/
+		cx -= game->GetScreenWidth() / 2;
+		CGame::GetInstance()->SetCamPos(round(cx), round(cy));
+	}
+	else
+	{
+		CGame::GetInstance()->SetCamPos(START_CAM_X, round(cy));
+	}
+
+	/*if (cx >= rightM)
+	{
+		rightM = cx;
+		leftM = cx - 50;
+	}
+	else if (cx <= leftM)
+	{
+		rightM = cx + 50;
+		leftM = cx;
+	}
+	lastcx = cx;*/
 }
 
 void CPlayScene::Render()
@@ -308,7 +338,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_X:
 	{
 		if (mario->GetJump() == 1)
+		{
+			if (mario->GetLevel() == MARIO_LEVEL_TAIL)
+			{
+				mario->SetState(MARIO_STATE_JUM_DOWN_SLO);
+			}
 			break;
+		}
 		else
 		{
 			if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
@@ -335,17 +371,6 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	{
 		downz = 1;
 	}
-	if (game->IsKeyDown(DIK_S))
-	{
-		if (mario->CheckFall() == 0&&mario->CheckS()==0)
-		{
-			if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
-				mario->SetState(MARIO_STATE_BOW_JUMP_SLOMOTION);
-			else
-				mario->SetState(MARIO_STATE_JUM_SLOMOTION);
-			DebugOut(L"\nVx = %i", mario->CheckS());
-		}
-	}
 	if (game->IsKeyDown(DIK_RIGHT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT) && downz != 1)
@@ -358,4 +383,40 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 		mario->SetState(MARIO_STATE_BOW);
 	else
 		mario->SetState(MARIO_STATE_IDLE);
+
+	if (game->IsKeyDown(DIK_S)/*&&!(game->IsKeyDown(DIK_DOWN))*/)
+	{
+		if (mario->CheckFall() == 0 && mario->CheckS() == 0)
+		{
+			if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
+				mario->SetState(MARIO_STATE_BOW_JUMP_SLOMOTION);
+			else
+				mario->SetState(MARIO_STATE_JUM_SLOMOTION);
+		}
+		else
+		{
+			if (mario->GetLevel() == MARIO_LEVEL_TAIL)
+			{
+				mario->SetState(MARIO_STATE_JUM_DOWN_SLO);
+			}
+		}
+	}
+	//else if (game->IsKeyDown(DIK_S) && (game->IsKeyDown(DIK_DOWN)))
+	//{
+	//	if (mario->CheckFall() == 0 && mario->CheckS() == 0)
+	//	{
+	//		if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
+	//			mario->SetState(MARIO_STATE_BOW_JUMP_SLOMOTION);
+	//		else
+	//			mario->SetState(MARIO_STATE_JUM_SLOMOTION);
+	//	}
+	//	/*else
+	//	{
+	//		if (mario->GetLevel() == MARIO_LEVEL_TAIL)
+	//		{
+	//			mario->SetState(MARIO_STATE_JUM_DOWN_BOW_SLO);
+	//		}
+	//	}*/
+	//}
+
 }

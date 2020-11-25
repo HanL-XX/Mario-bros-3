@@ -205,7 +205,7 @@ void CMario::Render()
 	else
 		if (level == MARIO_LEVEL_TAIL)
 		{
-			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP)
+			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP|| state == MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{
 				if (nx > 0)
 					ani = MARIO_ANI_TAIL_BOW_RIGHT;
@@ -246,10 +246,20 @@ void CMario::Render()
 					}
 					else
 					{
-						if (nx > 0)
-							ani = MARIO_ANI_TAIL_JUMP_DOWN_RIGHT;
+						if (state == MARIO_STATE_JUM_DOWN_SLO)
+						{
+							if (nx > 0)
+								ani = MARIO_ANI_TAIL_JUMP_DOWN_RIGHT_SLO;
+							else
+								ani = MARIO_ANI_TAIL_JUMP_DOWN_LEFT_SLO;
+						}
 						else
-							ani = MARIO_ANI_TAIL_JUMP_DOWN_LEFT;
+						{
+							if (nx > 0)
+								ani = MARIO_ANI_TAIL_JUMP_DOWN_RIGHT;
+							else
+								ani = MARIO_ANI_TAIL_JUMP_DOWN_LEFT;
+						}
 					}
 				}
 			}
@@ -282,7 +292,7 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_FIRE)
 		{
-			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP)
+			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP || state == MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{
 				if (nx > 0)
 					ani = MARIO_ANI_FIRE_BOW_RIGHT;
@@ -359,7 +369,7 @@ void CMario::Render()
 		}
 		else if (level == MARIO_LEVEL_BIG)
 		{
-			if (state == MARIO_STATE_BOW||state== MARIO_STATE_BOW_JUMP)
+		if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP || state == MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{
 				if (nx > 0)
 					ani = MARI_ANI_BIG_BOW_RIGHT;
@@ -502,6 +512,8 @@ void CMario::Render()
 	animation_set->at(ani)->Render(x, y, alpha);
 
 	RenderBoundingBox();
+	//DebugOut(L"\nstate = %i", state);
+
 }
 
 void CMario::SetState(int state)
@@ -684,6 +696,16 @@ void CMario::SetState(int state)
 			turn = 0;
 			bowjump = 1;
 			break;
+		case MARIO_STATE_JUM_DOWN_SLO:
+			vy = MARIO_JUMP_SPEED_Y_FALL;
+			if (run == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
+			timeturn = NULL;
+			turn = 0;
+			break;
 		}
 	}
 	if (laststate)
@@ -697,7 +719,7 @@ void CMario::SetState(int state)
 		}
 		if (level == MARIO_LEVEL_TAIL)
 		{
-			if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW || laststate == MARIO_STATE_BOW_JUMP && state != MARIO_STATE_BOW_JUMP)
+			if (laststate == MARIO_STATE_BOW && state != MARIO_STATE_BOW || laststate == MARIO_STATE_BOW_JUMP && state != MARIO_STATE_BOW_JUMP || laststate == MARIO_STATE_BOW_JUMP_SLOMOTION && state != MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{
 				SetPosition(x, y + MARIO_TAIL_BOW_BBOX_HEIGHT - MARIO_TAIL_BBOX_HEIGHT);
 			}
@@ -720,7 +742,6 @@ void CMario::SetState(int state)
 	}
 	lastvx = vx;
 	laststate = state;
-	//DebugOut(L"\nVx = %f", y);
 }
 
 void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom)
@@ -729,7 +750,7 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	top = y;
 	if (level == MARIO_LEVEL_TAIL)
 	{
-		if (state == MARIO_STATE_BOW)
+		if (state == MARIO_STATE_BOW/*||state== MARIO_STATE_BOW_JUMP_SLOMOTION||state==MARIO_STATE_BOW_JUMP*/)
 		{
 			right = x + MARIO_TAIL_BOW_BBOX_WIDTH;
 			bottom = y + MARIO_TAIL_BOW_BBOX_HEIGHT;
@@ -742,7 +763,7 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	}
 	else if (level == MARIO_LEVEL_FIRE)
 	{
-		if (state == MARIO_STATE_BOW)
+		if (state == MARIO_STATE_BOW /*|| state == MARIO_STATE_BOW_JUMP_SLOMOTION || state == MARIO_STATE_BOW_JUMP*/)
 		{
 			right = x + MARIO_BIG_BBOX_BOW_WIDTH;
 			bottom = y + MARIO_BIG_BBOX_BOW_HEIGHT;
@@ -755,7 +776,7 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	}
 	else if (level == MARIO_LEVEL_BIG)
 	{
-		if (state == MARIO_STATE_BOW)
+		if (state == MARIO_STATE_BOW /*|| state == MARIO_STATE_BOW_JUMP_SLOMOTION || state == MARIO_STATE_BOW_JUMP*/)
 		{
 			right = x + MARIO_BIG_BBOX_BOW_WIDTH;
 			bottom = y + MARIO_BIG_BBOX_BOW_HEIGHT;

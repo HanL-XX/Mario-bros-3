@@ -5,13 +5,14 @@
 //0.1f
 #define MARIO_JUMP_SPEED_Y		0.5f
 #define MARIO_JUMP_SPEED_Y_SLOMOTION	0.3f
+#define MARIO_JUMP_SPEED_Y_FALL	0.07f
 #define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
 #define MARIO_RUN_SPEED	0.15f
 #define MARIO_RUN_FAST_SPEED	0.25f
 
-#define MARIO_JUMP_HIGH	70
+#define MARIO_JUMP_HIGH	80
 
 
 #define MARIO_STATE_IDLE			0
@@ -29,6 +30,7 @@
 #define MARIO_STATE_BOW_JUMP 1002
 #define MARIO_STATE_BOW_JUMP_SLOMOTION 1003
 #define MARIO_STATE_JUM_SLOMOTION	1004
+#define MARIO_STATE_JUM_DOWN_SLO 1005
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -112,6 +114,8 @@
 #define MARIO_ANI_TAIL_JUMP_DOWN_RIGHT 64
 #define MARIO_ANI_TAIL_JUMP_UP_LEFT	65
 #define MARIO_ANI_TAIL_JUMP_DOWN_LEFT	66
+#define MARIO_ANI_TAIL_JUMP_DOWN_LEFT_SLO 68
+#define MARIO_ANI_TAIL_JUMP_DOWN_RIGHT_SLO 67
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -127,10 +131,10 @@
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 15
 
-#define MARIO_TAIL_BBOX_WIDTH	21
+#define MARIO_TAIL_BBOX_WIDTH	19
 #define MARIO_TAIL_BBOX_HEIGHT	28
 
-#define MARIO_TAIL_BOW_BBOX_WIDTH	21
+#define MARIO_TAIL_BOW_BBOX_WIDTH	19
 #define MARIO_TAIL_BOW_BBOX_HEIGHT	18
 
 #define MARIO_UNTOUCHABLE_TIME 5000
@@ -179,6 +183,8 @@ public:
 			checkfallY = y;
 			checkS = 0;
 		}
+		if (vy > 0)
+			checkS = 1;
 		if (checkfallY - this->y >= MARIO_JUMP_HIGH)
 		{
 			checkS = 1;
@@ -188,5 +194,6 @@ public:
 			return 0;
 	}
 	int CheckS() { return this->checkS; }
+	int GetLevel() { return this->level; }
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };

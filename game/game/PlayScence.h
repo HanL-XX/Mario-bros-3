@@ -8,7 +8,7 @@
 #include "Goomba.h"
 #include "Koopas.h"
 
-
+#define START_CAM_X 24
 class CPlayScene : public CScene
 {
 protected:
@@ -21,8 +21,7 @@ protected:
 	void _ParseSection_ANIMATIONS(string line);
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
-
-
+	float leftM,rightM, lastcx;
 public:
 	CPlayScene(int id, LPCWSTR filePath);
 
@@ -30,7 +29,7 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
-
+	
 	CMario* GetPlayer() { return player; }
 
 	//friend class CPlayScenceKeyHandler;
@@ -44,4 +43,5 @@ public:
 	virtual void OnKeyUp(int KeyCode) {};
 	CPlayScenceKeyHandler(CScene* s) :CScenceKeyHandler(s) {};
 };
+
 
