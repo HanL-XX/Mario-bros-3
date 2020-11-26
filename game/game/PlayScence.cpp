@@ -268,14 +268,14 @@ void CPlayScene::Update(DWORD dt)
 	// Update camera to follow mario
 	float cx, cy;
 	player->GetPosition(cx, cy);
-	DebugOut(L"\ncy = %f", cy);
+	DebugOut(L"\ncy = %f", cx);
 	CGame* game = CGame::GetInstance();
-	/*
+	float xmario = cx;
 	if (!leftM || !rightM)
 	{
-		rightM = cx;
-		leftM = cx - 50;
-	}*/
+		rightM = START_CAM_X + game->GetScreenWidth() / 2+ TRANST_CAM;
+		leftM = START_CAM_X + game->GetScreenWidth() / 2;
+	}
 
 	if (cy > 385 - game->GetScreenHeight() / 2)
 	{
@@ -283,29 +283,30 @@ void CPlayScene::Update(DWORD dt)
 	}
 	if (cx >= START_CAM_X +game->GetScreenWidth() / 2)
 	{
-		/*if (cx<=leftM || cx>=rightM)
-			cx -= game->GetScreenWidth() / 2;
+		if (cx >= rightM)
+		{
+			cx = lastcx + cx - rightM;
+			rightM = xmario;
+			leftM = xmario - TRANST_CAM;
+		}
+		else if(cx<=leftM)
+		{
+			cx = lastcx -(leftM-cx);
+			rightM = xmario + TRANST_CAM;
+			leftM = xmario;
+		}
 		else
-			cx = lastcx;*/
-		cx -= game->GetScreenWidth() / 2;
+		{
+			cx = lastcx;
+		}
+		lastcx = cx;
 		CGame::GetInstance()->SetCamPos(round(cx), round(cy));
 	}
 	else
 	{
+		lastcx = START_CAM_X;
 		CGame::GetInstance()->SetCamPos(START_CAM_X, round(cy));
 	}
-
-	/*if (cx >= rightM)
-	{
-		rightM = cx;
-		leftM = cx - 50;
-	}
-	else if (cx <= leftM)
-	{
-		rightM = cx + 50;
-		leftM = cx;
-	}
-	lastcx = cx;*/
 }
 
 void CPlayScene::Render()
