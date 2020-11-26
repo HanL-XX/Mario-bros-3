@@ -8,8 +8,9 @@
 #include "Goomba.h"
 #include "Koopas.h"
 
-#define START_CAM_X 24
-#define TRANST_CAM 20 
+#define START_CAM_X 29
+#define END_CAM_X 2680
+#define TRANST_CAM 20
 class CPlayScene : public CScene
 {
 protected:
