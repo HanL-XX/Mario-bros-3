@@ -71,6 +71,17 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	else
 		run = 0;
+	if (timefly)
+	{
+		if (GetTickCount64() - timefly <= MARIO_TIME_FLY)
+		{
+			fly = 1;
+		}
+		else
+			fly = 0;
+	}
+	else
+		fly = 0;
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
 	{
@@ -228,12 +239,29 @@ void CMario::Render()
 			}
 			else if (jump == 1)
 			{
-				if (run == 1)
+				if (fly==1)
+				{
+					if (vy > 0)
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_TAIL_FALL_FLY_RIGHT;
+						else
+							ani = MARIO_ANI_TAIL_FALL_FLY_LEFT;
+					}
+					else
+					{
+						if (nx > 0)
+							ani = MARIO_ANI_TAIL_FLY_RIGHT;
+						else
+							ani = MARIO_ANI_TAIL_FLY_LEFT;
+					}
+				}
+				else if (run == 1)
 				{
 					if (nx > 0)
-						ani = MARIO_ANI_FIRE_JUM_FAST_RIGHT;
+						ani = MARIO_ANI_TAIL_JUM_FAST_RIGHT;
 					else
-						ani = MARIO_ANI_FIRE_JUM_FAST_LEFT;
+						ani = MARIO_ANI_TAIL_JUM_FAST_LEFT;
 				}
 				else
 				{
@@ -246,7 +274,7 @@ void CMario::Render()
 					}
 					else
 					{
-						if (state == MARIO_STATE_JUM_DOWN_SLO)
+						if (state == MARIO_STATE_JUM_DOWN_SLO_S|| state == MARIO_STATE_JUM_DOWN_SLO_X)
 						{
 							if (nx > 0)
 								ani = MARIO_ANI_TAIL_JUMP_DOWN_RIGHT_SLO;
@@ -521,7 +549,8 @@ void CMario::SetState(int state)
 	
 	if (state == MARIO_STATE_BOW && jump == 1)
 		return;
-	
+	/*if (fly == 1)
+		state == MARIO_STATE_FLY;*/
 	CGameObject::SetState(state);
 	if (jump == 1)
 	{
@@ -529,7 +558,10 @@ void CMario::SetState(int state)
 		timeturn = NULL;
 	}
 	else
+	{
 		bowjump = 0;
+		flyset = 0;
+	}
 	if (bowjump == 1)
 	{
 		switch (state)
@@ -696,8 +728,8 @@ void CMario::SetState(int state)
 			turn = 0;
 			bowjump = 1;
 			break;
-		case MARIO_STATE_JUM_DOWN_SLO:
-			vy = MARIO_JUMP_SPEED_Y_FALL;
+		case MARIO_STATE_JUM_DOWN_SLO_X:
+			vy = MARIO_JUMP_SPEED_Y_FALL_X;
 			if (run == 0)
 			{
 				lastrun = 0;
@@ -706,6 +738,62 @@ void CMario::SetState(int state)
 			timeturn = NULL;
 			turn = 0;
 			break;
+		case MARIO_STATE_JUM_DOWN_SLO_S:
+			vy = MARIO_JUMP_SPEED_Y_FALL_S;
+			if (run == 0)
+			{
+				lastrun = 0;
+				timerun = NULL;
+			}
+			timeturn = NULL;
+			turn = 0;
+			break;
+		case MARIO_STATE_FLY_S:
+			if (!timefly&&flyset==0)
+			{
+				timefly = GetTickCount64();
+				fly = 1;
+				flyset = 1;
+			}
+			if (fly==1)
+			{
+				vy = -MARIO_FLY_S;
+				lastrun = 0;
+				timerun = NULL;
+				timeturn = NULL;
+				turn = 0;
+				DebugOut(L"vx = %i\n", run);
+				break;
+			}
+			else
+			{
+				DebugOut(L"vx = %i\n", run);
+				timefly = NULL;
+				break;
+			}
+		case MARIO_STATE_FLY_X:
+			if (!timefly && flyset == 0)
+			{
+				timefly = GetTickCount64();
+				fly = 1;
+				flyset = 1;
+			}
+			if (fly == 1)
+			{
+				vy = -MARIO_FLY_X;
+				lastrun = 0;
+				timerun = NULL;
+				timeturn = NULL;
+				turn = 0;
+				DebugOut(L"vx = %i\n", run);
+				break;
+			}
+			else
+			{
+				DebugOut(L"vx = %i\n", run);
+				timefly = NULL;
+				break;
+			}
 		}
 	}
 	if (laststate)

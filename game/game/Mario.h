@@ -5,7 +5,11 @@
 //0.1f
 #define MARIO_JUMP_SPEED_Y		0.5f
 #define MARIO_JUMP_SPEED_Y_SLOMOTION	0.3f
-#define MARIO_JUMP_SPEED_Y_FALL	0.07f
+#define MARIO_JUMP_SPEED_Y_FALL_S	0.07f
+#define MARIO_JUMP_SPEED_Y_FALL_X	0.01f
+#define MARIO_FLY_S	0.1f
+#define MARIO_FLY_X	0.3f
+
 #define MARIO_JUMP_DEFLECT_SPEED 0.5f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
@@ -30,8 +34,10 @@
 #define MARIO_STATE_BOW_JUMP 1002
 #define MARIO_STATE_BOW_JUMP_SLOMOTION 1003
 #define MARIO_STATE_JUM_SLOMOTION	1004
-#define MARIO_STATE_JUM_DOWN_SLO 1005
-
+#define MARIO_STATE_JUM_DOWN_SLO_S 1005
+#define MARIO_STATE_FLY_S 1006
+#define MARIO_STATE_FLY_X 1007
+#define MARIO_STATE_JUM_DOWN_SLO_X 1008
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
 #define MARIO_ANI_BIG_IDLE_LEFT			1
@@ -116,6 +122,13 @@
 #define MARIO_ANI_TAIL_JUMP_DOWN_LEFT	66
 #define MARIO_ANI_TAIL_JUMP_DOWN_LEFT_SLO 68
 #define MARIO_ANI_TAIL_JUMP_DOWN_RIGHT_SLO 67
+#define MARIO_ANI_TAIL_FLY_RIGHT	69
+#define MARIO_ANI_TAIL_FLY_LEFT	70
+#define MARIO_ANI_TAIL_JUM_FAST_RIGHT 71
+#define MARIO_ANI_TAIL_JUM_FAST_LEFT	72
+#define MARIO_ANI_TAIL_FALL_FLY_RIGHT 73
+#define MARIO_ANI_TAIL_FALL_FLY_LEFT 74
+
 
 #define	MARIO_LEVEL_SMALL	1
 #define	MARIO_LEVEL_BIG		2
@@ -140,6 +153,7 @@
 #define MARIO_UNTOUCHABLE_TIME 5000
 #define MARIO_TIMERUN_2HAND 1000
 #define MARIO_TIME_TURN	95
+#define MARIO_TIME_FLY	5000
 
 class CMario : public CGameObject
 {
@@ -148,6 +162,9 @@ class CMario : public CGameObject
 	DWORD untouchable_start;
 	DWORD timerun;
 	DWORD timeturn;
+	DWORD timefly;
+	int fly;
+	int flyset = 0;
 	int run;
 	int lastrun;
 	int turn;
@@ -195,5 +212,6 @@ public:
 	}
 	int CheckS() { return this->checkS; }
 	int GetLevel() { return this->level; }
+	int Fly() { return this->fly; }
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };
