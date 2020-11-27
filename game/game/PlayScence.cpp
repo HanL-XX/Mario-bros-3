@@ -400,6 +400,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	{
 		downz = 1;
 	}
+	
 	if (game->IsKeyDown(DIK_RIGHT) && downz != 1)
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	else if (game->IsKeyDown(DIK_LEFT) && downz != 1)
@@ -412,7 +413,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 		mario->SetState(MARIO_STATE_BOW);
 	else
 		mario->SetState(MARIO_STATE_IDLE);
-
+	
 	if (game->IsKeyDown(DIK_S)/*&&!(game->IsKeyDown(DIK_DOWN))*/)
 	{
 		if (mario->GetLevel() == 4 && (mario->GetRun() == 1||mario->Fly()==1))
@@ -441,6 +442,10 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 				}
 			}
 		}
+	}
+	if (game->IsKeyDown(DIK_Z))
+	{
+		mario->SetState(MARIO_STATE_TICKTAIL);
 	}
 	//else if (game->IsKeyDown(DIK_S) && (game->IsKeyDown(DIK_DOWN)))
 	//{

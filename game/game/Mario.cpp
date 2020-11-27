@@ -216,7 +216,15 @@ void CMario::Render()
 	else
 		if (level == MARIO_LEVEL_TAIL)
 		{
-			if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP|| state == MARIO_STATE_BOW_JUMP_SLOMOTION)
+			if (state == MARIO_STATE_TICKTAIL)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_TAIL_TICKTAIL_RIGHT;
+				else
+					ani = MARIO_ANI_TAIL_TICKTAIL_LEFT;
+				DebugOut(L"vx = %i\n", state);
+			}
+			else if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP|| state == MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{
 				if (nx > 0)
 					ani = MARIO_ANI_TAIL_BOW_RIGHT;
