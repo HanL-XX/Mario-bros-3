@@ -156,6 +156,7 @@
 #define MARIO_TIMERUN_2HAND 1000
 #define MARIO_TIME_TURN	95
 #define MARIO_TIME_FLY	5000
+#define MARIO_TIME_TICKTAIL 150
 
 class CMario : public CGameObject
 {
@@ -165,6 +166,7 @@ class CMario : public CGameObject
 	DWORD timerun;
 	DWORD timeturn;
 	DWORD timefly;
+	DWORD timeticktail;
 	int fly;
 	int flyset = 0;
 	int run;

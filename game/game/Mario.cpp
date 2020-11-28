@@ -155,10 +155,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				CCoin* Coin = dynamic_cast<CCoin*>(e->obj);
 
-				if (e->ny != 0||e->nx!=0)
-				{
-					Coin->Clear();
-				}
+				//if (e->ny != 0||e->nx!=0)
+				//{
+				//	Coin->Clear();
+				//}
 			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
@@ -554,7 +554,11 @@ void CMario::Render()
 
 void CMario::SetState(int state)
 {
-	
+	if (state == MARIO_STATE_TICKTAIL&&!timeticktail)
+	{
+		timeticktail = GetTickCount64();
+	}
+
 	if (state == MARIO_STATE_BOW && jump == 1)
 		return;
 	/*if (fly == 1)
@@ -589,7 +593,6 @@ void CMario::SetState(int state)
 		case MARIO_STATE_SMALL_RUN_FAST_RIGHT:
 			vx = MARIO_WALKING_SPEED;
 			nx = 1;
-			break;
 			break;
 		}
 		CGameObject::SetState(MARIO_STATE_BOW_JUMP);
@@ -770,12 +773,12 @@ void CMario::SetState(int state)
 				timerun = NULL;
 				timeturn = NULL;
 				turn = 0;
-				DebugOut(L"vx = %i\n", run);
+				//DebugOut(L"vx = %i\n", run);
 				break;
 			}
 			else
 			{
-				DebugOut(L"vx = %i\n", run);
+				//DebugOut(L"vx = %i\n", run);
 				timefly = NULL;
 				break;
 			}
@@ -793,12 +796,12 @@ void CMario::SetState(int state)
 				timerun = NULL;
 				timeturn = NULL;
 				turn = 0;
-				DebugOut(L"vx = %i\n", run);
+				//DebugOut(L"vx = %i\n", run);
 				break;
 			}
 			else
 			{
-				DebugOut(L"vx = %i\n", run);
+				//DebugOut(L"vx = %i\n", run);
 				timefly = NULL;
 				break;
 			}
@@ -835,6 +838,15 @@ void CMario::SetState(int state)
 		timerun = NULL;
 		lastrun = 0;
 		turn = 1;
+	}
+	if (GetTickCount64() - timeticktail < MARIO_TIME_TICKTAIL)
+	{
+		CGameObject::SetState(MARIO_STATE_TICKTAIL);
+		return;
+	}
+	else
+	{
+		timeticktail = NULL;
 	}
 	lastvx = vx;
 	laststate = state;

@@ -383,6 +383,9 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 				break;
 			}
 		}
+	case DIK_A:
+		mario->SetState(MARIO_STATE_TICKTAIL);
+		break;
 	case DIK_R:
 		mario->Reset();
 		break; 
