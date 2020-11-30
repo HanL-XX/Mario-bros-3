@@ -5,6 +5,7 @@
 #include "Coin.h"
 #include "Street.h"
 #include "BackInvis.h"
+#include "Mario.h"
 
 
 CGoomba::CGoomba()
@@ -16,7 +17,7 @@ void CGoomba::GetBoundingBox(float& left, float& top, float& right, float& botto
 {
 	left = x;
 	top = y;
-	if (state==GOOMBA_STATE_BM)
+	if (state==GOOMBA_STATE_BM||state==GOOMBA_STATE_DIE_FLY)
 	{
 		left = NULL;
 		top = NULL;
@@ -56,7 +57,16 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		return;
 	}
+	//if (state == GOOMBA_STATE_DIE_FLY)
+	//{
+	//	if (laststate == GOOMBA_STATE_DIE_FLY&&state!= GOOMBA_STATE_DIE_FLY)
+	//	{
+	//		vy = -GOOMBA_FLY_DIE;
+	//		/*state = GOOMBA_STATE_DIE_FLY;*/
+	//	}
+	//}
 	vy += GOOMBA_GRAVITY * &dt;
+	DebugOut(L"\timedie = %f\n", vx);
 	CGameObject::Update(dt, coObjects);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -96,10 +106,21 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			//DebugOut(L"\nsize: %d", coEventsResult.size());
-
 			LPCOLLISIONEVENT e = coEventsResult.at(i);
-			if (nx != 0) vx = -vx;
-			if (ny < 0) vy = 0;
+			if (dynamic_cast<CMario*>(e->obj))
+			{
+				CMario* Mario = dynamic_cast<CMario*>(e->obj);
+				if (Mario->GetState() == MARIO_STATE_TICKTAIL)
+				{
+					if (Mario->GetX() - x > 0)
+						vx = -GOOMBA_WALKING_SPEED
+					else
+						vx = GOOMBA_WALKING_SPEED;
+					SetState(GOOMBA_STATE_DIE_FLY);
+				}
+			}
+			if (nx != 0 && state != GOOMBA_STATE_DIE_FLY) vx = -vx;
+			if (ny < 0 && state != GOOMBA_STATE_DIE_FLY) vy = 0;
 			x += min_tx * dx + nx * 0.8f;
 			y += min_ty * dy + ny * 0.4f;
 		}
@@ -123,6 +144,10 @@ void CGoomba::Render()
 	if (state == GOOMBA_STATE_PARA_FLY)
 	{
 		ani = GOOMBA_ANI_PARA_FLY;
+	}
+	if (state == GOOMBA_STATE_DIE_FLY)
+	{
+		ani = GOOMBA_ANI_DIE_FLY;
 	}
 	animation_set->at(ani)->Render(x, y);
 	//DebugOut(L"\nStateRender: %d", state);
@@ -177,9 +202,15 @@ void CGoomba::SetState(int state)
 	case GOOMBA_STATE_PARA_FLY:
 		vx = -GOOMBA_WALKING_SPEED;
 		break;
+	case GOOMBA_STATE_DIE_FLY:
+		/*if (vx > 0)
+			vx = -GOOMBA_WALKING_SPEED
+		else
+			vx = GOOMBA_WALKING_SPEED;*/
+		vy = -GOOMBA_FLY_DIE;
 	}
 	//DebugOut(L"\nrun = %f\n", timedie);
-
+	laststate = state;
 }
 void CGoomba::Clear()
 {

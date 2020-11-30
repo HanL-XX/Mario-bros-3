@@ -3,8 +3,8 @@
 
 #define GOOMBA_WALKING_SPEED 0.05f;
 #define GOOMBA_JUMP_SPEED 0.5f;
-#define GOOMBA_GRAVITY	0.001f;
-
+#define GOOMBA_GRAVITY	0.01f;
+#define GOOMBA_FLY_DIE 0.2f
 
 #define GOOMBA_BBOX_WIDTH 16
 #define GOOMBA_BBOX_HEIGHT 15
@@ -20,16 +20,19 @@
 #define	GOOMBA_STATE_BM	300
 #define GOOMBA_STATE_PARA_WALK 400
 #define GOOMBA_STATE_PARA_FLY 500
+#define GOOMBA_STATE_DIE_FLY 600
 
 #define GOOMBA_ANI_WALKING 0
 #define GOOMBA_ANI_DIE 1
 #define GOOMBA_ANI_PARA_WALK 2
 #define GOOMBA_ANI_PARA_FLY	3
+#define GOOMBA_ANI_DIE_FLY 4
 
 #define GOOMBA_LEVEL_BT	0
 #define GOOMBA_LEVEL_PARA 1
 
 #define	GOOMBA_TIME_DIE	200
+#define	GOOMBA_TIME_DIE_FLY 250
 
 class CGoomba : public CGameObject
 {
@@ -37,6 +40,8 @@ class CGoomba : public CGameObject
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	DWORD	timedie;
+	DWORD timediefly;
+	int laststate;
 
 public:
 	CGoomba();

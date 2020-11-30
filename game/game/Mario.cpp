@@ -172,16 +172,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						goomba->Clear();
 						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
-					//if (goomba->GetState() == GOOMBA_STATE_DIE)
-					//{
-					//	goomba->Clear();
-					//}
 				}
-				else if (e->nx != 0)
+				if (e->nx != 0)
 				{
 					if (untouchable == 0)
 					{
-						if (goomba->GetState() != GOOMBA_STATE_DIE)
+						if (state == MARIO_STATE_TICKTAIL)
+						{
+							
+						}
+						else if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
 							if (level > MARIO_LEVEL_SMALL)
 							{
@@ -222,7 +222,6 @@ void CMario::Render()
 					ani = MARIO_ANI_TAIL_TICKTAIL_RIGHT;
 				else
 					ani = MARIO_ANI_TAIL_TICKTAIL_LEFT;
-				DebugOut(L"vx = %i\n", state);
 			}
 			else if (state == MARIO_STATE_BOW || state == MARIO_STATE_BOW_JUMP|| state == MARIO_STATE_BOW_JUMP_SLOMOTION)
 			{

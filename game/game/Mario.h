@@ -217,5 +217,6 @@ public:
 	int CheckS() { return this->checkS; }
 	int GetLevel() { return this->level; }
 	int Fly() { return this->fly; }
+	float GetX() { return this->x; }
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 };
