@@ -354,7 +354,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	switch (KeyCode)
 	{
 	case DIK_X:
-		if (mario->GetLevel() == 4 && (mario->GetRun() == 1 || mario->Fly() == 1))
+		if (mario->GetLevel() == MARIO_LEVEL_TAIL && (mario->GetRun() == 1 || mario->Fly() == 1))
 		{
 			if (mario->GetJump() == 1)
 			{
@@ -419,7 +419,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	
 	if (game->IsKeyDown(DIK_S)/*&&!(game->IsKeyDown(DIK_DOWN))*/)
 	{
-		if (mario->GetLevel() == 4 && (mario->GetRun() == 1||mario->Fly()==1))
+		if (mario->GetLevel() == MARIO_LEVEL_TAIL && (mario->GetRun() == 1||mario->Fly()==1))
 		{
 			if (mario->GetJump() == 1)
 			{
@@ -435,13 +435,18 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 				if (mario->GetState() == MARIO_STATE_BOW || mario->GetState() == MARIO_STATE_BOW_JUMP)
 					mario->SetState(MARIO_STATE_BOW_JUMP_SLOMOTION);
 				else
+				{
 					mario->SetState(MARIO_STATE_JUM_SLOMOTION);
+					DebugOut(L"\n1");
+				}
+				
 			}
 			else
 			{
 				if (mario->GetLevel() == MARIO_LEVEL_TAIL)
 				{
 					mario->SetState(MARIO_STATE_JUM_DOWN_SLO_S);
+					DebugOut(L"\n2");
 				}
 			}
 		}

@@ -88,6 +88,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		untouchable_start = 0;
 		untouchable = 0;
 	}
+	//float lastx = x, lasty = y, lastvx = vx, lastvy = vy;
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
@@ -105,7 +106,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		for (UINT i = 0; i < coEvents.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEvents[i];
-
 			if (dynamic_cast<Cbox*>(e->obj))
 			{
 				FilterCollisionbox(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
@@ -144,21 +144,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				jump = 0;
 			}
 
-			if (dynamic_cast<CStreet*>(e->obj))
-			{
-				CStreet* brick = dynamic_cast<CStreet*>(e->obj);
-				/*x += min_tx * dx + nx * 0.4f;
-				y += min_ty * dy + ny * 0.001f;*/
-
-			}
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* Coin = dynamic_cast<CCoin*>(e->obj);
-
-				//if (e->ny != 0||e->nx!=0)
-				//{
-				//	Coin->Clear();
-				//}
+				if (e->ny != 0||e->nx!=0)
+				{
+					Coin->Clear();
+				}
+				if (e->ny != 0)
+					checkS = 0;
 			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
@@ -202,7 +196,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
 		}
-
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];

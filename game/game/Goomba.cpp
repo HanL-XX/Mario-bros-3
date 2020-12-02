@@ -66,7 +66,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//	}
 	//}
 	vy += GOOMBA_GRAVITY * &dt;
-	DebugOut(L"\timedie = %f\n", vx);
+	//DebugOut(L"\timedie = %f\n", vx);
 	CGameObject::Update(dt, coObjects);
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;

@@ -1,4 +1,9 @@
 #include "Koopas.h"
+#include "Utils.h"
+#include "box.h"
+#include "Coin.h"
+#include "BackInvis.h"
+#include "Mario.h"
 
 CKoopas::CKoopas()
 {
@@ -19,22 +24,55 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	CGameObject::Update(dt, coObjects);
+	vy += KOOPAS_GRAVITY * dt;
+	//DebugOut(L"\timedie = %f\n", y); 
+	CGameObject::Update(dt, coObjects); 
 
-	//
-	// TO-DO: make sure Koopas can interact with the world and to each of them too!
-	// 
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
 
-	x += dx;
-	y += dy;
+	coEvents.clear();
 
-	if (vx < 0 && x < 0) {
-		x = 0; vx = -vx;
+	CalcPotentialCollisions(coObjects, coEvents);
+
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
 	}
-
-	if (vx > 0 && x > 290) {
-		x = 290; vx = -vx;
+	else
+	{
+		float min_tx, min_ty, nx, ny;
+		float rdx = 0;
+		float rdy = 0;
+		// TODO: This is a very ugly designed function!!!!
+		for (UINT i = 0; i < coEvents.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEvents[i];
+			if (dynamic_cast<Cbox*>(e->obj))
+			{
+				FilterCollisionbox(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+			}
+			else if (dynamic_cast<CCoin*>(e->obj) || dynamic_cast<CBackInvis*>(e->obj))
+			{
+				FilterCollisioncoin(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+			}
+			else
+			{
+				FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+			}
+			if (nx != 0) vx = -vx;
+			if (ny < 0) vy = 0;
+			//x += min_tx * dx + nx * 0.8f;
+			//y += min_ty * dy + ny * 0.4f;
+		}
+		for (UINT i = 0; i < coEventsResult.size(); i++)
+		{
+			
+		}
 	}
+	// clean up collision events
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 
 void CKoopas::Render()
@@ -64,5 +102,4 @@ void CKoopas::SetState(int state)
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
 	}
-
 }
