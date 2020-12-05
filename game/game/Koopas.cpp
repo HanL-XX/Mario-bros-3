@@ -4,6 +4,9 @@
 #include "Coin.h"
 #include "BackInvis.h"
 #include "Mario.h"
+#include "Street.h"
+#include "Brick.h"
+#include "Goomba.h"
 
 CKoopas::CKoopas()
 {
@@ -16,7 +19,7 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_DIE)
+	if (state == KOOPAS_STATE_DIE||state== KOOPAS_STATE_DIE_SWAP||state==KOOPAS_STATE_BACKUP|| state == KOOPAS_STATE_BACKUP_SWAP)
 		bottom = y + KOOPAS_BBOX_HEIGHT_DIE;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT;
@@ -24,6 +27,25 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (timedie)
+	{
+		if (GetTickCount64() - timedie > KOOPAS_TIME_DIE_AGEL)
+		{
+			if(state==KOOPAS_STATE_DIE)
+				SetState(KOOPAS_STATE_BACKUP);
+			else
+				SetState(KOOPAS_STATE_BACKUP_SWAP);
+		}
+	}
+	if (timebackup)
+	{
+		if (GetTickCount64() - timebackup > KOOPAS_TIME_DIE_BACKUP)
+		{
+			timebackup = NULL;
+			SetState(KOOPAS_STATE_WALKING);
+			y = y + KOOPAS_BBOX_HEIGHT_DIE - KOOPAS_BBOX_HEIGHT;
+		}
+	}
 	vy += KOOPAS_GRAVITY * dt;
 	//DebugOut(L"\timedie = %f\n", y); 
 	CGameObject::Update(dt, coObjects); 
@@ -61,16 +83,42 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 			}
-			if (nx != 0) vx = -vx;
-			if (ny < 0) vy = 0;
-			//x += min_tx * dx + nx * 0.8f;
-			//y += min_ty * dy + ny * 0.4f;
 		}
+		//FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
+
+		if (nx != 0) vx = -vx;
+		if (ny != 0) vy = 0;
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
-			
+			LPCOLLISIONEVENT e = coEventsResult.at(i);
+			if (dynamic_cast<CStreet*>(e->obj)|| dynamic_cast<Cbox*>(e->obj) || dynamic_cast<CBackInvis*>(e->obj))
+			{
+				CGameObject* game = dynamic_cast<CGameObject*>(e->obj);
+				if (e->nx != 0&&abs(y-game->GetY())> CONST_VC)//hang so va cham
+				{
+					vx = lastvx;
+				}
+			}
+			if (dynamic_cast<CMario*>(e->obj))
+			{
+				CMario* Mario = dynamic_cast<CMario*>(e->obj);
+			/*	if (Mario->GetState() == MARIO_STATE_TICKTAIL)
+				{
+					if (Mario->GetX() - x > 0)
+						vy = -0.8;
+					else
+						vy = -0.8;
+				}*/
+			}
 		}
+		CGameObject::Update(dt, coObjects);
+
+		x += min_tx * dx + nx * 0.8f;
+		y += min_ty * dy + ny * 0.4f;
 	}
+	lastvx = vx;
+	lastx = x;
+	lasty = y;
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
@@ -78,8 +126,21 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CKoopas::Render()
 {
 	int ani = KOOPAS_ANI_WALKING_LEFT;
-	if (state == KOOPAS_STATE_DIE) {
+	if (state == KOOPAS_STATE_DIE) 
+	{
 		ani = KOOPAS_ANI_DIE;
+	}
+	else if (state == KOOPAS_STATE_BACKUP)
+	{
+		ani = KOOPAS_ANI_BACKUP;
+	}
+	else if (state == KOOPAS_STATE_BACKUP_SWAP)
+	{
+		ani = KOOPAS_ANI_BACKUP_SWAP;
+	}
+	else if (state == KOOPAS_STATE_DIE_SWAP)
+	{
+		ani = KOOPAS_ANI_DIE_SWAP;
 	}
 	else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
 	else if (vx <= 0) ani = KOOPAS_ANI_WALKING_LEFT;
@@ -94,12 +155,42 @@ void CKoopas::SetState(int state)
 	CGameObject::SetState(state);
 	switch (state)
 	{
+	case KOOPAS_STATE_BACKUP_SWAP:
+		timedie = NULL;
+		if (!timebackup)
+		{
+			timebackup = GetTickCount64();
+		}
+		vx = 0;
+		vy = 0;
+		break;
+	case KOOPAS_STATE_BACKUP:
+		timedie = NULL;
+		if (!timebackup)
+		{
+			timebackup = GetTickCount64();
+		}
+		vx = 0;
+		vy = 0;
+		break;
 	case KOOPAS_STATE_DIE:
-		y += KOOPAS_BBOX_HEIGHT - KOOPAS_BBOX_HEIGHT_DIE + 1;
+		if (!timedie)
+		{
+			timedie = GetTickCount64();
+		}
+		vx = 0;
+		vy = 0;
+		break;
+	case KOOPAS_STATE_DIE_SWAP:
+		if (!timedie)
+		{
+			timedie = GetTickCount64();
+		}
 		vx = 0;
 		vy = 0;
 		break;
 	case KOOPAS_STATE_WALKING:
 		vx = KOOPAS_WALKING_SPEED;
+		timedie = NULL;
 	}
 }

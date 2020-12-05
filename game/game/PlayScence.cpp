@@ -437,7 +437,6 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 				else
 				{
 					mario->SetState(MARIO_STATE_JUM_SLOMOTION);
-					DebugOut(L"\n1");
 				}
 				
 			}
@@ -446,7 +445,6 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 				if (mario->GetLevel() == MARIO_LEVEL_TAIL)
 				{
 					mario->SetState(MARIO_STATE_JUM_DOWN_SLO_S);
-					DebugOut(L"\n2");
 				}
 			}
 		}

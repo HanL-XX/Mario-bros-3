@@ -12,6 +12,7 @@
 90	textures\enemies-2.png	0	128	128
 100	textures\mario1.png	255	255	255
 110	textures\enemiesSWAP.png	3	26	110
+120	textures\enemies-3.png	255	255	255
 
 # id	left	top	right	bottom	texture_id
 [SPRITES]
@@ -311,13 +312,19 @@
 95	2525	25	2800	170	60
 #Koopas
 #walk left
-50001	205	191	221	217	90
-50002	222	191	238	217	90
+50001	165	199	181	225	120
+50002	125	198	141	225	120
 #walk right
-50011	187	191	202	217	90
-50012	170	191	185	217	90
+50011	215	199	231	225	120
+50012	255	198	271	225	120
 #die
-50031	152	202	168	217	20
+50031	50	204	66	220	120
+#dieswap
+50032	330	204	346	220	120
+#backup
+50033	84	203	102	220	120
+#backipswap
+50034	294	203	312	220	120
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
 # ==== MARIO =========
@@ -606,6 +613,12 @@
 902	50011	100	50012	100
 #die
 903	50031	100
+#dieswap
+904	50032	100
+#backup
+905	50031	50	50033	50
+#backupswap
+906	50032	50	50034	50
 #
 # id	ani1	ani2	ani3
 #
@@ -621,7 +634,7 @@
 # GOOMBA
 3	701	702	703	704	705
 #KOOPAS
-4	901	902	903
+4	901	902	903	904	905	906
 #STREET
 #Startsmall
 41	1

@@ -103,16 +103,18 @@ void CGameObject::FilterCollision(
 		if (c->t < min_tx && c->nx != 0) 
 		{
 			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
+			coEventsResult.push_back(coEvents[min_ix]);
 		}
 
 		if (c->t < min_ty && c->ny != 0) 
 		{
 			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy;
+			coEventsResult.push_back(coEvents[min_iy]);
 		}
 	}
 
-	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
-	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+	/*if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);*/
 
 }
 void CGameObject::FilterCollisionbox(
@@ -138,16 +140,18 @@ void CGameObject::FilterCollisionbox(
 		if (c->t < min_tx && c->nx != 0) 
 		{
 			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
+			coEventsResult.push_back(coEvents[min_ix]);
 		}
 
 		if (c->t < min_ty && c->ny < 0) 
 		{
 			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy;
+			coEventsResult.push_back(coEvents[min_iy]);
 		}
 	}
 
-	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
-	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+	/*if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);*/
 }
 void CGameObject::FilterCollisioncoin(
 	vector<LPCOLLISIONEVENT>& coEvents,
@@ -172,16 +176,18 @@ void CGameObject::FilterCollisioncoin(
 		if (c->t < min_tx && c->nx == 0)
 		{
 			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
+			coEventsResult.push_back(coEvents[min_ix]);
 		}
 
 		if (c->t < min_ty && c->ny == 0)
 		{
 			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy;
+			coEventsResult.push_back(coEvents[min_iy]);
 		}
 	}
 
-	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
-	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
+	//if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	//if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
 }
 
 void CGameObject::RenderBoundingBox()

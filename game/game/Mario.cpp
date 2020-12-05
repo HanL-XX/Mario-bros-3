@@ -10,6 +10,7 @@
 #include"box.h"
 #include "Street.h"
 #include "Coin.h"
+#include "Koopas.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -190,6 +191,48 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			} // if Goomba
+			if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				CKoopas* Koopas = dynamic_cast<CKoopas*>(e->obj);
+				if (e->ny < 0)
+				{
+					if (Koopas->GetState() == KOOPAS_STATE_DIE_SWAP|| Koopas->GetState() == KOOPAS_STATE_BACKUP_SWAP)
+					{
+						Koopas->SetState(KOOPAS_STATE_DIE_SWAP);
+					}
+					else 
+					{
+						Koopas->SetState(KOOPAS_STATE_DIE);
+
+					}
+					vy = -MARIO_JUMP_DEFLECT_SPEED;
+				}
+				if (e->nx != 0)
+				{
+					if (untouchable == 0)
+					{
+						if (state == MARIO_STATE_TICKTAIL)
+						{
+							Koopas->SetState(KOOPAS_STATE_DIE_SWAP);
+						}
+						else 
+						{
+							if (Koopas->Getvx() != 0)
+							{
+								if (level > MARIO_LEVEL_SMALL)
+								{
+									level = MARIO_LEVEL_SMALL;
+									StartUntouchable();
+								}
+								else
+								{
+									SetState(MARIO_STATE_DIE);
+								}
+							}
+						}
+					}
+				}
+			}
 			else if (dynamic_cast<CPortal*>(e->obj))
 			{
 				CPortal* p = dynamic_cast<CPortal*>(e->obj);
