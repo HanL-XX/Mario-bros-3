@@ -2,8 +2,9 @@
 
 #include "GameObject.h"
 
-#define KOOPAS_WALKING_SPEED 0.03f;
+#define KOOPAS_WALKING_SPEED 0.03f
 #define KOOPAS_GRAVITY 0.001f
+#define KOOPAS_FLY_FALL 0.3f
 #define CONST_VC 11
 
 #define KOOPAS_BBOX_WIDTH 16
@@ -37,6 +38,9 @@ class CKoopas : public CGameObject
 public:
 	CKoopas();
 	virtual void SetState(int state);
-	float Getvx() { return vx; }
-	void SetVy(float a) { vy = a; }
+	float Getvx() { return vx; };
+	float Getvy() { return vy; };
+	float Getx() { return x; };
+	void SetVy(float a) { vy = a; };
+	void SetVx(float b) { vx = b; };
 };

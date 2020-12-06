@@ -199,11 +199,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (Koopas->GetState() == KOOPAS_STATE_DIE_SWAP|| Koopas->GetState() == KOOPAS_STATE_BACKUP_SWAP)
 					{
 						Koopas->SetState(KOOPAS_STATE_DIE_SWAP);
+						Koopas->SetVy(0);
 					}
 					else 
 					{
 						Koopas->SetState(KOOPAS_STATE_DIE);
-
 					}
 					vy = -MARIO_JUMP_DEFLECT_SPEED;
 				}
@@ -214,6 +214,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						if (state == MARIO_STATE_TICKTAIL)
 						{
 							Koopas->SetState(KOOPAS_STATE_DIE_SWAP);
+							if (this->x - Koopas->Getx() > 0)
+								Koopas->SetVx(-KOOPAS_WALKING_SPEED);
+							else
+								Koopas->SetVx(KOOPAS_WALKING_SPEED);
 						}
 						else 
 						{

@@ -384,7 +384,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			}
 		}
 	case DIK_A:
-		mario->SetState(MARIO_STATE_TICKTAIL);
+		if (mario->GetLevel() == MARIO_LEVEL_TAIL)
+		{
+			mario->SetState(MARIO_STATE_TICKTAIL);
+		}
 		break;
 	case DIK_R:
 		mario->Reset();
@@ -451,7 +454,10 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	}
 	if (game->IsKeyDown(DIK_Z))
 	{
-		mario->SetState(MARIO_STATE_TICKTAIL);
+		if (mario->GetLevel() == MARIO_LEVEL_TAIL)
+		{
+			mario->SetState(MARIO_STATE_TICKTAIL);
+		}
 	}
 	//else if (game->IsKeyDown(DIK_S) && (game->IsKeyDown(DIK_DOWN)))
 	//{
